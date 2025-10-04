@@ -1,0 +1,20 @@
+name: Build & Publish (CI)
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build backend image
+        run: |
+          docker build -t question-bank-backend ./backend
+      - name: Build website
+        run: |
+          cd website && npm ci && npm run build
+      - name: Build mobile (release)
+        run: |
+          cd mobile && flutter pub get && flutter build apk --release
