@@ -1,29 +1,25 @@
 const express = require('express');
 const programController = require('../controllers/program.controller');
+const authController = require('../controllers/auth.controller');
 
 const router = express.Router();
+router.use(authController.protect);
 
-// Create & Get all programs
+
 router
   .route('/')
-  .post(programController.createProgram)
+  .post(authController.restrictTo('admin'), programController.createProgram) 
   .get(programController.getAllPrograms);
-
-// Get, Update, Delete single program
 router
   .route('/:id')
-  .get(programController.getProgram)
-  .put(programController.updateProgram)
-  .delete(programController.hardDeleteProgram);
-
-// Soft delete program
+  .get(programController.getProgram) 
+  .put(authController.restrictTo('admin'), programController.updateProgram) 
+  .delete(authController.restrictTo('admin'), programController.hardDeleteProgram); 
 router
   .route('/:id/soft-delete')
-  .patch(programController.softDeleteProgram);
-
-// Restore soft-deleted program
+  .patch(authController.restrictTo('admin'), programController.softDeleteProgram); 
 router
   .route('/:id/restore')
-  .patch(programController.restoreProgram);
+  .patch(authController.restrictTo('admin'), programController.restoreProgram); 
 
 module.exports = router;
