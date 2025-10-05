@@ -16,34 +16,48 @@ const programSchema = new mongoose.Schema(
       ref: 'University',
       required: [true, 'University ID is required']
     },
-    courses: [{
-      name: {
-        type: String,
-        required: [true, 'Course name is required'],
-        trim: true
-      },
-      code: {
-        type: String,
-        required: [true, 'Course code is required'],
-        trim: true,
-        uppercase: true
-      },
-      description: {
-        type: String,
-        trim: true
-      },
-      credits: {
-        type: Number,
-        default: 3,
-        min: [1, 'Credits must be at least 1'],
-        max: [10, 'Credits cannot exceed 10']
-      },
-      isDeleted: {
-        type: Boolean,
-        default: false
-      },
-      deletedAt: Date
-    }],
+    level: {
+      type: String,
+      enum: ['Bachelor', 'Master', 'PhD', 'Diploma', 'Certificate'],
+      default: 'Bachelor'
+    },
+    duration: {
+      type: String,
+      default: '4 years'
+    },
+    eligibility: {
+      type: String,
+      default: 'High School Diploma'
+    },
+    careerPaths: {
+      type: [String],
+      default: ['Undecided']
+    },
+    isFeatured: {
+      type: Boolean,
+      default: false
+    },
+    // ================= SUBSCRIPTIONS =================
+    subscribers: [
+      {
+        student: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        subscribedAt: { type: Date, default: Date.now },
+        fullAccess: { type: Boolean, default: true } // Full access to program content
+      }
+    ],
+    examAccess: [
+      {
+        examId: { type: mongoose.Schema.Types.ObjectId, ref: 'Exam' },
+        student: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        subscribedAt: { type: Date, default: Date.now }
+      }
+    ],
+    exams: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Exam'
+      }
+    ],
     isDeleted: {
       type: Boolean,
       default: false
@@ -53,29 +67,15 @@ const programSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Sparse unique index for course codes
-programSchema.index({ 'courses.code': 1 }, { 
-  unique: true, 
-  sparse: true
-});
+// Optional: unique index to prevent duplicate program names in same university
+programSchema.index({ university: 1, name: 1 }, { unique: true });
 
-// Pre-save middleware to validate course codes
-programSchema.pre('save', function(next) {
-  if (this.isModified('courses')) {
-    const courseCodes = new Set();
-    
-    for (const course of this.courses) {
-      if (course.code && !course.isDeleted) {
-        const normalizedCode = course.code.trim().toUpperCase();
-        if (courseCodes.has(normalizedCode)) {
-          return next(new Error(`Duplicate course code found: ${normalizedCode}`));
-        }
-        courseCodes.add(normalizedCode);
-        course.code = normalizedCode;
-      }
-    }
+// Virtual field to show placeholder if no exams added
+programSchema.virtual('examsInfo').get(function () {
+  if (!this.exams || this.exams.length === 0) {
+    return ['Exams will be uploaded soon'];
   }
-  next();
+  return this.exams;
 });
 
 module.exports = mongoose.model('Program', programSchema);
