@@ -1,9 +1,8 @@
 // controllers/university.controller.js
 const University = require('../models/university.model');
-const Program = require('../models/program.model');
+const Program = require('../models/course.model');
 const Course = require('../models/course.model');
-const ExamType = require('../models/examType.model');
-const Question = require('../models/question.model');
+// const Question = require('../models/question.model');
 
 // ================== CREATE UNIVERSITY ==================
 exports.createUniversity = async (req, res) => {
