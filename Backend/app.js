@@ -1,20 +1,13 @@
-// app.js
+
 const express = require('express');
 const morgan = require('morgan');
 const userRouter = require('./routes/user.routes');
 const universityRouter = require('./routes/university.routes');
+const programRouter = require('./routes/program.routes'); 
 
 const app = express();
-
-// ====== MIDDLEWARE ======
-
-// Body parser
 app.use(express.json());
-
-// Serve static files
 app.use(express.static('public'));
-
-// Development logging
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
@@ -22,6 +15,6 @@ if (process.env.NODE_ENV === 'development') {
 // ====== ROUTES ======
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/universities', universityRouter);
-
+app.use('/api/v1/programs', programRouter); 
 
 module.exports = app;

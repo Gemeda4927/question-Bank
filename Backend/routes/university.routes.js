@@ -1,29 +1,24 @@
 const express = require('express');
 const universityController = require('../controllers/university.controller');
+const authController = require('../controllers/auth.controller');
 
 const router = express.Router();
 
-// Create & Get all universities
+router.use(authController.protect);
 router
   .route('/')
-  .post(universityController.createUniversity)
-  .get(universityController.getAllUniversities);
-
-// Get, Update, Delete single university
+  .post(authController.restrictTo('admin'), universityController.createUniversity) 
+  .get(universityController.getAllUniversities); 
 router
   .route('/:id')
-  .get(universityController.getUniversity)
-  .put(universityController.updateUniversity)
-  .delete(universityController.hardDeleteUniversity);
-
-// Soft delete university
+  .get(universityController.getUniversity) 
+  .put(authController.restrictTo('admin'), universityController.updateUniversity) 
+  .delete(authController.restrictTo('admin'), universityController.hardDeleteUniversity);
 router
   .route('/:id/soft-delete')
-  .patch(universityController.softDeleteUniversity);
-
-// Restore soft-deleted university
+  .patch(authController.restrictTo('admin'), universityController.softDeleteUniversity); 
 router
   .route('/:id/restore')
-  .patch(universityController.restoreUniversity);
+  .patch(authController.restrictTo('admin'), universityController.restoreUniversity); 
 
 module.exports = router;
