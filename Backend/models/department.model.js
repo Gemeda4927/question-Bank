@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
 
-const courseSchema = new mongoose.Schema(
+const departmentSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, 'Course name is required'],
+      required: [true, 'Department name is required'],
       trim: true
     },
     code: {
@@ -12,15 +12,17 @@ const courseSchema = new mongoose.Schema(
       required: true,
       unique: true
     },
-    description: { type: String, trim: true },
-    credits: { type: Number, default: 3 },
-    program: {
+    description: {
+      type: String,
+      trim: true
+    },
+    university: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Program',
+      ref: 'University',
       required: true
     },
-    examTypes: [
-      { type: mongoose.Schema.Types.ObjectId, ref: 'ExamType' }
+    programs: [
+      { type: mongoose.Schema.Types.ObjectId, ref: 'Program' } 
     ],
     isDeleted: { type: Boolean, default: false },
     deletedAt: Date
@@ -28,4 +30,4 @@ const courseSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model('Course', courseSchema);
+module.exports = mongoose.model('Department', departmentSchema);

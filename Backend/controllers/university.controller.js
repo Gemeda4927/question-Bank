@@ -1,8 +1,5 @@
 // controllers/university.controller.js
 const University = require('../models/university.model');
-const Program = require('../models/course.model');
-const Course = require('../models/course.model');
-// const Question = require('../models/question.model');
 
 // ================== CREATE UNIVERSITY ==================
 exports.createUniversity = async (req, res) => {
@@ -35,16 +32,8 @@ exports.getAllUniversities = async (req, res) => {
       .skip(skip)
       .limit(Number(limit))
       .populate({
-        path: 'programs',
-        select: 'name description duration faculty isActive',
-        populate: {
-          path: 'courses',
-          select: 'name code creditHours semester',
-          populate: {
-            path: 'examTypes',
-            select: 'type price'
-          }
-        }
+        path: 'departments',
+        select: 'name code description'
       });
 
     const total = await University.countDocuments(query);
@@ -69,16 +58,8 @@ exports.getUniversity = async (req, res) => {
   try {
     const university = await University.findById(req.params.id)
       .populate({
-        path: 'programs',
-        select: 'name description duration faculty isActive',
-        populate: {
-          path: 'courses',
-          select: 'name code creditHours semester',
-          populate: {
-            path: 'examTypes',
-            select: 'type price'
-          }
-        }
+        path: 'departments',
+        select: 'name code description'
       });
 
     if (!university || university.isDeleted) {
@@ -191,7 +172,7 @@ exports.getUniversityStats = async (req, res) => {
           name: 1,
           location: 1,
           createdAt: 1,
-          totalPrograms: { $size: '$programs' }
+          totalDepartments: { $size: '$departments' }
         }
       }
     ]);
