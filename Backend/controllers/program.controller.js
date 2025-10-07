@@ -1,164 +1,172 @@
-const Program = require('../models/course.model');
-const University = require('../models/university.model');
+const Program = require('../models/program.model');
+const Department = require('../models/department.model');
 
-// ======================= CREATE PROGRAM =======================
+// ======================== CREATE PROGRAM ========================
 exports.createProgram = async (req, res) => {
   try {
-    const { name, description, universityId, level, duration, eligibility, careerPaths, isFeatured } = req.body;
+    const {
+      name,
+      code,
+      description,
+      departmentId,
+      courses,
+      durationInYears,
+      level,
+      creditRequirement,
+      enrollmentLimit,
+      isFeatured,
+    } = req.body;
 
-    // Check if university exists
-    const university = await University.findById(universityId);
-    if (!university) {
-      return res.status(404).json({ message: 'University not found' });
+    if (!departmentId) {
+      return res.status(400).json({ status: 'fail', message: 'departmentId is required' });
     }
 
     const program = await Program.create({
       name,
+      code,
       description,
-      university: universityId,
-      level: level || 'Bachelor',
-      duration: duration || '4 years',
-      eligibility: eligibility || 'High School Diploma',
-      careerPaths: careerPaths || ['Undecided'],
-      isFeatured: isFeatured || false
+      departmentId,
+      courses: courses || null,
+      durationInYears,
+      level,
+      creditRequirement,
+      enrollmentLimit,
+      isFeatured: isFeatured || false,
     });
 
-    // Add program to university's programs array
-    university.programs.push(program._id);
-    await university.save();
+    // Add program to department
+    await Department.findByIdAndUpdate(departmentId, {
+      $push: { programs: program._id },
+    });
 
-    // Populate university and subscribers for response
-    const populatedProgram = await Program.findById(program._id)
-      .populate('university', 'name location')
-      .populate('subscribers.student', 'name email')
-      .populate('examAccess.examId', 'name examType');
-
-    res.status(201).json({ message: 'Program created successfully', program: populatedProgram });
+    res.status(201).json({
+      status: 'success',
+      message: '🎉 Program created successfully!',
+      data: program,
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(400).json({ status: 'fail', message: error.message });
   }
 };
 
-// ======================= GET ALL PROGRAMS =======================
+// ======================== GET ALL PROGRAMS ========================
 exports.getAllPrograms = async (req, res) => {
   try {
     const programs = await Program.find({ isDeleted: false })
-      .populate('university', 'name location')
-      .populate('subscribers.student', 'name email')
-      .populate('examAccess.examId', 'name examType');
+      .populate('departmentId', 'name code')
+      .populate('courses', 'name code')
+      .populate('students', 'name email'); // optional
 
-    res.status(200).json({ programs });
+    res.status(200).json({
+      status: 'success',
+      results: programs.length,
+      data: programs,
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(400).json({ status: 'fail', message: error.message });
   }
 };
 
-// ======================= GET SINGLE PROGRAM =======================
+// ======================== GET PROGRAM BY ID ========================
 exports.getProgram = async (req, res) => {
   try {
     const program = await Program.findById(req.params.id)
-      .populate('university', 'name location')
-      .populate('subscribers.student', 'name email')
-      .populate('examAccess.examId', 'name examType');
+      .populate('departmentId', 'name code')
+      .populate('courses', 'name code')
+      .populate('students', 'name email');
 
     if (!program || program.isDeleted) {
-      return res.status(404).json({ message: 'Program not found' });
+      return res.status(404).json({ status: 'fail', message: 'Program not found' });
     }
 
-    res.status(200).json({ program });
+    res.status(200).json({ status: 'success', data: program });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(400).json({ status: 'fail', message: error.message });
   }
 };
 
-// ======================= UPDATE PROGRAM =======================
+// ======================== UPDATE PROGRAM ========================
 exports.updateProgram = async (req, res) => {
   try {
-    const { name, description, level, duration, eligibility, careerPaths, isFeatured } = req.body;
-    const program = await Program.findById(req.params.id);
+    const program = await Program.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
+      .populate('departmentId', 'name code')
+      .populate('courses', 'name code')
+      .populate('students', 'name email');
 
     if (!program || program.isDeleted) {
-      return res.status(404).json({ message: 'Program not found' });
+      return res.status(404).json({ status: 'fail', message: 'Program not found' });
     }
 
-    if (name) program.name = name;
-    if (description) program.description = description;
-    if (level) program.level = level;
-    if (duration) program.duration = duration;
-    if (eligibility) program.eligibility = eligibility;
-    if (careerPaths) program.careerPaths = careerPaths;
-    if (isFeatured !== undefined) program.isFeatured = isFeatured;
-
-    program.updatedAt = Date.now();
-    await program.save();
-
-    const populatedProgram = await Program.findById(program._id)
-      .populate('university', 'name location')
-      .populate('subscribers.student', 'name email')
-      .populate('examAccess.examId', 'name examType');
-
-    res.status(200).json({ message: 'Program updated successfully', program: populatedProgram });
+    res.status(200).json({ status: 'success', message: '✅ Program updated', data: program });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(400).json({ status: 'fail', message: error.message });
   }
 };
 
-// ======================= SOFT DELETE PROGRAM =======================
+// ======================== SOFT DELETE PROGRAM ========================
 exports.softDeleteProgram = async (req, res) => {
   try {
-    const program = await Program.findById(req.params.id);
-    if (!program || program.isDeleted) {
-      return res.status(404).json({ message: 'Program not found' });
-    }
+    const program = await Program.findByIdAndUpdate(
+      req.params.id,
+      { isDeleted: true, deletedAt: Date.now() },
+      { new: true }
+    );
 
-    program.isDeleted = true;
-    program.deletedAt = Date.now();
-    await program.save();
+    if (!program) return res.status(404).json({ status: 'fail', message: 'Program not found' });
 
-    res.status(200).json({ message: 'Program soft-deleted successfully' });
+    res.status(200).json({ status: 'success', message: '🗑️ Program soft-deleted', data: program });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(400).json({ status: 'fail', message: error.message });
   }
 };
 
-// ======================= RESTORE PROGRAM =======================
+// ======================== RESTORE PROGRAM ========================
 exports.restoreProgram = async (req, res) => {
   try {
-    const program = await Program.findById(req.params.id);
-    if (!program || !program.isDeleted) {
-      return res.status(404).json({ message: 'Program not found or not deleted' });
-    }
+    const program = await Program.findByIdAndUpdate(
+      req.params.id,
+      { isDeleted: false, deletedAt: null },
+      { new: true }
+    );
 
-    program.isDeleted = false;
-    program.deletedAt = null;
-    await program.save();
+    if (!program) return res.status(404).json({ status: 'fail', message: 'Program not found' });
 
-    const populatedProgram = await Program.findById(program._id)
-      .populate('university', 'name location')
-      .populate('subscribers.student', 'name email')
-      .populate('examAccess.examId', 'name examType');
-
-    res.status(200).json({ message: 'Program restored successfully', program: populatedProgram });
+    res.status(200).json({ status: 'success', message: '♻️ Program restored', data: program });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(400).json({ status: 'fail', message: error.message });
   }
 };
 
-// ======================= HARD DELETE PROGRAM =======================
+// ======================== HARD DELETE PROGRAM ========================
 exports.hardDeleteProgram = async (req, res) => {
   try {
     const program = await Program.findByIdAndDelete(req.params.id);
-    if (!program) {
-      return res.status(404).json({ message: 'Program not found' });
+
+    if (!program) return res.status(404).json({ status: 'fail', message: 'Program not found' });
+
+    res.status(200).json({ status: 'success', message: '❌ Program permanently deleted' });
+  } catch (error) {
+    res.status(400).json({ status: 'fail', message: error.message });
+  }
+};
+
+// ======================== STUDENT SUBSCRIBE TO PROGRAM ========================
+exports.subscribeStudent = async (req, res) => {
+  try {
+    const { studentId } = req.body;
+
+    const program = await Program.findById(req.params.id);
+    if (!program || program.isDeleted) return res.status(404).json({ status: 'fail', message: 'Program not found' });
+
+    if (program.students.includes(studentId)) {
+      return res.status(400).json({ status: 'fail', message: 'Student already enrolled in this program' });
     }
 
-    // Remove program reference from university
-    await University.findByIdAndUpdate(program.university, {
-      $pull: { programs: program._id }
-    });
+    program.students.push(studentId);
+    await program.save();
 
-    res.status(200).json({ message: 'Program permanently deleted' });
+    res.status(200).json({ status: 'success', message: 'Student subscribed successfully', data: program });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(400).json({ status: 'fail', message: error.message });
   }
 };

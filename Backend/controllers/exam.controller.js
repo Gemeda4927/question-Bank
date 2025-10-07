@@ -1,136 +1,160 @@
 const Exam = require('../models/exam.model');
+const Course = require('../models/course.model');
+const User = require('../models/user.model');
 
-// ====================== CREATE EXAM ======================
+// ======================== CREATE EXAM ========================
 exports.createExam = async (req, res) => {
   try {
-    const exam = await Exam.create(req.body);
+    const { name, code, courseId, description, date, duration, totalMarks, passingMarks } = req.body;
 
-    const populatedExam = await Exam.findById(exam._id)
-      .populate({
-        path: 'program',
-        select: 'name level duration university',
-        populate: { path: 'university', select: 'name location' }
-      })
-      .populate('subscribers.student', 'name email')
-      .populate('questions', 'text options');
+    if (!courseId) {
+      return res.status(400).json({ status: 'fail', message: 'Course ID is required' });
+    }
 
-    res.status(201).json({ success: true, exam: populatedExam });
+    const exam = await Exam.create({
+      name,
+      code,
+      courseId,
+      description,
+      date,
+      duration,
+      totalMarks,
+      passingMarks,
+    });
+
+    // Add exam to course's exams array
+    await Course.findByIdAndUpdate(courseId, { $push: { exams: exam._id } });
+
+    res.status(201).json({ status: 'success', message: '🎉 Exam created successfully!', data: exam });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(400).json({ status: 'fail', message: error.message });
   }
 };
 
-// ====================== GET ALL EXAMS ======================
+// ======================== GET ALL EXAMS ========================
 exports.getAllExams = async (req, res) => {
   try {
     const exams = await Exam.find({ isDeleted: false })
-      .populate({
-        path: 'program',
-        select: 'name level duration university',
-        populate: { path: 'university', select: 'name location' }
-      })
-      .populate('subscribers.student', 'name email')
-      .populate('questions', 'text options');
+      .populate('courseId', 'name code')
+      .populate('subscribedStudents.studentId', 'name email');
 
-    res.status(200).json({ success: true, count: exams.length, exams });
+    res.status(200).json({ status: 'success', results: exams.length, data: exams });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(400).json({ status: 'fail', message: error.message });
   }
 };
 
-// ====================== GET EXAM BY ID ======================
-exports.getExam = async (req, res) => {
+// ======================== GET EXAM BY ID ========================
+exports.getExamById = async (req, res) => {
   try {
     const exam = await Exam.findById(req.params.id)
-      .populate({
-        path: 'program',
-        select: 'name level duration university',
-        populate: { path: 'university', select: 'name location' }
-      })
-      .populate('subscribers.student', 'name email')
-      .populate('questions', 'text options');
+      .populate('courseId', 'name code')
+      .populate('subscribedStudents.studentId', 'name email');
 
     if (!exam || exam.isDeleted) {
-      return res.status(404).json({ success: false, message: 'Exam not found' });
+      return res.status(404).json({ status: 'fail', message: 'Exam not found' });
     }
 
-    const questionsInfo = exam.questions && exam.questions.length > 0
-      ? exam.questions
-      : ['Questions on the way'];
-
-    res.status(200).json({ success: true, exam: { ...exam.toObject(), questions: questionsInfo } });
+    res.status(200).json({ status: 'success', data: exam });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(400).json({ status: 'fail', message: error.message });
   }
 };
 
-// ====================== UPDATE EXAM ======================
+// ======================== UPDATE EXAM ========================
 exports.updateExam = async (req, res) => {
   try {
-    const exam = await Exam.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true
-    })
-      .populate({
-        path: 'program',
-        select: 'name level duration university',
-        populate: { path: 'university', select: 'name location' }
-      })
-      .populate('subscribers.student', 'name email')
-      .populate('questions', 'text options');
+    const exam = await Exam.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
 
     if (!exam || exam.isDeleted) {
-      return res.status(404).json({ success: false, message: 'Exam not found' });
+      return res.status(404).json({ status: 'fail', message: 'Exam not found' });
     }
 
-    res.status(200).json({ success: true, exam });
+    res.status(200).json({ status: 'success', message: '✅ Exam updated', data: exam });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(400).json({ status: 'fail', message: error.message });
   }
 };
 
-// ====================== SOFT DELETE EXAM ======================
+// ======================== SOFT DELETE EXAM ========================
 exports.softDeleteExam = async (req, res) => {
   try {
-    const exam = await Exam.findByIdAndUpdate(
-      req.params.id,
-      { isDeleted: true, deletedAt: Date.now() },
-      { new: true }
-    );
+    const exam = await Exam.findByIdAndUpdate(req.params.id, { isDeleted: true, deletedAt: Date.now() }, { new: true });
 
-    if (!exam) return res.status(404).json({ success: false, message: 'Exam not found' });
+    if (!exam) return res.status(404).json({ status: 'fail', message: 'Exam not found' });
 
-    res.status(200).json({ success: true, message: 'Exam soft-deleted', exam });
+    res.status(200).json({ status: 'success', message: '🗑️ Exam soft-deleted', data: exam });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(400).json({ status: 'fail', message: error.message });
   }
 };
 
-// ====================== RESTORE EXAM ======================
+// ======================== RESTORE EXAM ========================
 exports.restoreExam = async (req, res) => {
   try {
-    const exam = await Exam.findByIdAndUpdate(
-      req.params.id,
-      { isDeleted: false, deletedAt: null },
-      { new: true }
-    );
+    const exam = await Exam.findByIdAndUpdate(req.params.id, { isDeleted: false, deletedAt: null }, { new: true });
 
-    if (!exam) return res.status(404).json({ success: false, message: 'Exam not found' });
+    if (!exam) return res.status(404).json({ status: 'fail', message: 'Exam not found' });
 
-    res.status(200).json({ success: true, message: 'Exam restored', exam });
+    res.status(200).json({ status: 'success', message: '♻️ Exam restored', data: exam });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(400).json({ status: 'fail', message: error.message });
   }
 };
 
-// ====================== HARD DELETE EXAM ======================
+// ======================== HARD DELETE EXAM ========================
 exports.hardDeleteExam = async (req, res) => {
   try {
     const exam = await Exam.findByIdAndDelete(req.params.id);
-    if (!exam) return res.status(404).json({ success: false, message: 'Exam not found' });
 
-    res.status(200).json({ success: true, message: 'Exam permanently deleted' });
+    if (!exam) return res.status(404).json({ status: 'fail', message: 'Exam not found' });
+
+    // Remove from course's exams array
+    await Course.findByIdAndUpdate(exam.courseId, { $pull: { exams: exam._id } });
+
+    res.status(200).json({ status: 'success', message: '❌ Exam permanently deleted' });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(400).json({ status: 'fail', message: error.message });
+  }
+};
+
+// ======================== SUBSCRIBE STUDENT TO EXAM ========================
+exports.subscribeStudentToExam = async (req, res) => {
+  try {
+    const { examId, studentId, paymentStatus } = req.body;
+
+    const exam = await Exam.findById(examId);
+    if (!exam || exam.isDeleted) {
+      return res.status(404).json({ status: 'fail', message: 'Exam not found' });
+    }
+
+    const student = await User.findById(studentId);
+    if (!student) return res.status(404).json({ status: 'fail', message: 'Student not found' });
+
+    await exam.addStudent(studentId, paymentStatus || 'paid');
+
+    res.status(200).json({ status: 'success', message: `🎉 Student ${student.name} subscribed to exam ${exam.name}` });
+  } catch (error) {
+    res.status(400).json({ status: 'fail', message: error.message });
+  }
+};
+
+// ======================== CHECK STUDENT ACCESS TO EXAM ========================
+exports.checkExamAccess = async (req, res) => {
+  try {
+    const { examId, studentId } = req.body;
+
+    const exam = await Exam.findById(examId);
+    if (!exam || exam.isDeleted) return res.status(404).json({ status: 'fail', message: 'Exam not found' });
+
+    const hasAccess = exam.canAccess(studentId);
+
+    res.status(200).json({
+      status: 'success',
+      data: { hasAccess },
+      message: hasAccess ? '✅ Student has access to this exam' : '❌ Student does not have access',
+    });
+  } catch (error) {
+    res.status(400).json({ status: 'fail', message: error.message });
   }
 };
