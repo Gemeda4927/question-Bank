@@ -5,86 +5,101 @@ const examSchema = new mongoose.Schema(
     name: {
       type: String,
       required: [true, 'Exam name is required'],
-      trim: true
+      trim: true,
+    },
+    code: {
+      type: String,
+      required: [true, 'Exam code is required'],
+      unique: true,
+      uppercase: true,
+      trim: true,
+    },
+    courseId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Course',
+      required: [true, 'Exam must belong to a course'],
     },
     description: {
       type: String,
-      trim: true
+      trim: true,
     },
-    program: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Program',
-      required: [true, 'Program ID is required']
+    date: {
+      type: Date,
+      required: [true, 'Exam date is required'],
     },
-    examType: {
-      type: String,
-      enum: [
-        'Regular',
-        'Mock',
-        'Final',
-        'Mid Exam',
-        'COC Exam',
-        'Exit Exam',
-        'University Entrance Exam'
-      ],
-      default: 'Regular'
+    duration: {
+      type: Number, // duration in minutes
+      required: [true, 'Exam duration is required'],
     },
     totalMarks: {
       type: Number,
-      default: 100
+      required: true,
+      min: 0,
     },
     passingMarks: {
       type: Number,
-      default: 50
+      required: true,
+      min: 0,
     },
-    duration: {
-      type: String,
-      default: '2 hours',
-      trim: true
-    },
-    schedule: {
-      startTime: Date,
-      endTime: Date
-    },
-    isPublished: {
-      type: Boolean,
-      default: false
-    },
-    accessType: {
-      type: String,
-      enum: ['SubscribedOnly', 'Free', 'ExamBased'],
-      default: 'SubscribedOnly'
-    },
-    subscribers: [
+    // Track students who paid for this specific exam
+    subscribedStudents: [
       {
-        student: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-        subscribedAt: { type: Date, default: Date.now }
-      }
-    ],
-    questions: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Question'
-      }
+        studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        paymentStatus: {
+          type: String,
+          enum: ['unpaid', 'paid', 'pending', 'failed'],
+          default: 'unpaid',
+        },
+        subscribedAt: { type: Date, default: Date.now },
+      },
     ],
     isDeleted: {
       type: Boolean,
-      default: false
+      default: false,
     },
-    deletedAt: Date
   },
   { timestamps: true }
 );
 
-// Unique index to prevent duplicate exam names in the same program
-examSchema.index({ program: 1, name: 1 }, { unique: true });
+// ====================== ADD STUDENT TO EXAM ======================
+examSchema.methods.addStudent = async function (studentId, paymentStatus = 'paid') {
+  const User = mongoose.model('User');
 
-// Virtual field to return placeholder if no questions
-examSchema.virtual('questionsInfo').get(function () {
-  if (!this.questions || this.questions.length === 0) {
-    return ['Questions on the way'];
+  const alreadySubscribed = this.subscribedStudents.some(
+    (s) => s.studentId.toString() === studentId.toString()
+  );
+
+  if (!alreadySubscribed) {
+    this.subscribedStudents.push({ studentId, paymentStatus });
+    await this.save();
   }
-  return this.questions;
-});
+
+  // Also add reference in User model
+  const student = await User.findById(studentId);
+  if (student) {
+    const courseSubscription = student.subscribedCourses.find(
+      (c) => c.courseId.toString() === this.courseId.toString()
+    );
+
+    if (courseSubscription) {
+      // Add examId to user's course subscription if not already present
+      courseSubscription.exams = courseSubscription.exams || [];
+      if (!courseSubscription.exams.includes(this._id)) {
+        courseSubscription.exams.push(this._id);
+      }
+      courseSubscription.paymentStatus = paymentStatus; // update payment status
+      await student.save();
+    }
+  }
+
+  return true;
+};
+
+// ====================== CHECK STUDENT ACCESS ======================
+examSchema.methods.canAccess = function (studentId) {
+  return this.subscribedStudents.some(
+    (s) => s.studentId.toString() === studentId.toString() && s.paymentStatus === 'paid'
+  );
+};
 
 module.exports = mongoose.model('Exam', examSchema);

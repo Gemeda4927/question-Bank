@@ -5,29 +5,42 @@ const departmentSchema = new mongoose.Schema(
     name: {
       type: String,
       required: [true, 'Department name is required'],
-      trim: true
+      trim: true,
     },
     code: {
       type: String,
       required: true,
-      unique: true
+      unique: true,
     },
     description: {
       type: String,
-      trim: true
+      trim: true,
     },
-    university: {
+    universityId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'University',
-      required: true
+      required: true,
     },
-    programs: [
-      { type: mongoose.Schema.Types.ObjectId, ref: 'Program' } 
-    ],
-    isDeleted: { type: Boolean, default: false },
-    deletedAt: Date
+    programs: {
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Program',
+        },
+      ],
+      default: [], // 👉 If no programs, it will be []
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    deletedAt: {
+      type: Date,
+    },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
 module.exports = mongoose.model('Department', departmentSchema);

@@ -1,11 +1,10 @@
-const User = require('../models/models.user');
+const User = require('../models/user.mode');
 
 // ====================== CREATE USER ======================
 exports.createUser = async (req, res) => {
   try {
     const newUser = await User.create(req.body);
-    // Ensure paymentStatus is returned even if not sent in request
-    const user = await User.findById(newUser._id);
+    const user = await User.findById(newUser._id); // return full user including subscriptions
     res.status(201).json({ success: true, user });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -58,7 +57,7 @@ exports.softDeleteUser = async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(
       req.params.id,
-      { isDeleted: true }, // Optional: add paymentStatus reset: paymentStatus: 'unpaid'
+      { isDeleted: true },
       { new: true }
     );
     if (!user) return res.status(404).json({ success: false, message: 'User not found' });
@@ -68,7 +67,7 @@ exports.softDeleteUser = async (req, res) => {
   }
 };
 
-// RESTORE SOFT-DELETED USER
+// ====================== RESTORE SOFT-DELETED USER ======================
 exports.restoreUser = async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(
@@ -76,15 +75,12 @@ exports.restoreUser = async (req, res) => {
       { isDeleted: false },
       { new: true }
     );
-
     if (!user) return res.status(404).json({ success: false, message: 'User not found' });
-
     res.status(200).json({ success: true, message: 'User restored successfully', user });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
-
 
 // ====================== HARD DELETE USER ======================
 exports.hardDeleteUser = async (req, res) => {
@@ -119,6 +115,38 @@ exports.updateProfile = async (req, res) => {
     );
     if (!user || user.isDeleted) return res.status(404).json({ success: false, message: 'User not found' });
     res.status(200).json({ success: true, user });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// ====================== SUBSCRIBE USER TO COURSE ======================
+exports.subscribeToCourse = async (req, res) => {
+  try {
+    const { courseId, paymentStatus = 'paid' } = req.body;
+    const user = await User.findById(req.user.id);
+    if (!user || user.isDeleted) return res.status(404).json({ success: false, message: 'User not found' });
+
+    await user.subscribeToCourse(courseId, paymentStatus);
+    res.status(200).json({ success: true, message: 'Subscribed to course successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// ====================== CHECK USER ACCESS TO COURSE/EXAM ======================
+exports.checkCourseAccess = async (req, res) => {
+  try {
+    const { courseId, examId } = req.body;
+    const user = await User.findById(req.user.id);
+    if (!user || user.isDeleted) return res.status(404).json({ success: false, message: 'User not found' });
+
+    const hasAccess = user.hasAccessToCourse(courseId, examId);
+    res.status(200).json({
+      success: true,
+      data: { hasAccess },
+      message: hasAccess ? '✅ User has access' : '❌ User does not have access',
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
