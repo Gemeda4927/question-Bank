@@ -5,19 +5,23 @@ const router = express.Router();
 
 // ======================== EXAM ROUTES ========================
 
+// GET all exams / POST create exam
 router.route('/')
-  .get(examController.getAllExams)       // Get all exams
-  .post(examController.createExam);      // Create exam
+  .get(examController.getAllExams)
+  .post(examController.createExam);
 
+// GET, UPDATE, DELETE exam by ID
 router.route('/:id')
-  .get(examController.getExam)           // Get exam by ID
-  .put(examController.updateExam)        // Update exam
-  .delete(examController.hardDeleteExam); // Delete exam
+  .get(examController.getExamById) 
+  .put(examController.updateExam)
+  .delete(examController.hardDeleteExam);
 
+// PATCH soft-delete exam
 router.route('/:id/soft-delete')
-  .patch(examController.softDeleteExam); // Soft delete exam
+  .patch(examController.softDeleteExam);
 
+// PATCH restore exam
 router.route('/:id/restore')
-  .patch(examController.restoreExam);    // Restore exam
+  .patch(examController.restoreExam);
 
 module.exports = router;
