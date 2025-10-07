@@ -57,6 +57,8 @@ const courseSchema = new mongoose.Schema(
         ref: 'Exam',
       },
     ],
+
+
     subscribedStudents: [
       {
         studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
@@ -78,6 +80,11 @@ const courseSchema = new mongoose.Schema(
         ],
       },
     ],
+
+
+
+
+    
     isDeleted: {
       type: Boolean,
       default: false,

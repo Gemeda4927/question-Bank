@@ -1,24 +1,28 @@
 const express = require('express');
-const router = express.Router();
 const courseController = require('../controllers/course.controller');
+const router = express.Router();
 
-// ======================== CREATE COURSE ========================
-router.post('/', courseController.createCourse)
-.get('/', courseController.getAllCourses);
+// ======================== ROUTES ========================
+router
+  .route('/')
+  .get(courseController.getAllCourses)
+  .post(courseController.createCourse);
 
-// ======================== GET COURSE BY ID ========================
-router.get('/:id', courseController.getCourseById);
+router
+  .route('/:id')
+  .get(courseController.getCourseById)
+  .put(courseController.updateCourse);
 
-// ======================== UPDATE COURSE ========================
-router.put('/:id', courseController.updateCourse);
+router
+  .route('/soft/:id')
+  .delete(courseController.softDeleteCourse);
 
-// ======================== SOFT DELETE COURSE ========================
-router.delete('/soft/:id', courseController.softDeleteCourse);
+router
+  .route('/restore/:id')
+  .patch(courseController.restoreCourse);
 
-// ======================== RESTORE COURSE ========================
-router.patch('/restore/:id', courseController.restoreCourse);
-
-// ======================== HARD DELETE COURSE ========================
-router.delete('/hard/:id', courseController.hardDeleteCourse);
+router
+  .route('/hard/:id')
+  .delete(courseController.hardDeleteCourse);
 
 module.exports = router;
