@@ -28,7 +28,7 @@ const examSchema = new mongoose.Schema(
       required: [true, 'Exam date is required'],
     },
     duration: {
-      type: Number, // duration in minutes
+      type: Number, // in minutes
       required: [true, 'Exam duration is required'],
     },
     totalMarks: {
@@ -41,7 +41,6 @@ const examSchema = new mongoose.Schema(
       required: true,
       min: 0,
     },
-    // Track students who paid for this specific exam
     subscribedStudents: [
       {
         studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
@@ -65,6 +64,7 @@ const examSchema = new mongoose.Schema(
 examSchema.methods.addStudent = async function (studentId, paymentStatus = 'paid') {
   const User = mongoose.model('User');
 
+  // Avoid duplicate subscription
   const alreadySubscribed = this.subscribedStudents.some(
     (s) => s.studentId.toString() === studentId.toString()
   );
@@ -74,7 +74,7 @@ examSchema.methods.addStudent = async function (studentId, paymentStatus = 'paid
     await this.save();
   }
 
-  // Also add reference in User model
+  // Update student's course subscription for exam reference
   const student = await User.findById(studentId);
   if (student) {
     const courseSubscription = student.subscribedCourses.find(
@@ -82,12 +82,11 @@ examSchema.methods.addStudent = async function (studentId, paymentStatus = 'paid
     );
 
     if (courseSubscription) {
-      // Add examId to user's course subscription if not already present
       courseSubscription.exams = courseSubscription.exams || [];
       if (!courseSubscription.exams.includes(this._id)) {
         courseSubscription.exams.push(this._id);
       }
-      courseSubscription.paymentStatus = paymentStatus; // update payment status
+      courseSubscription.paymentStatus = paymentStatus;
       await student.save();
     }
   }
