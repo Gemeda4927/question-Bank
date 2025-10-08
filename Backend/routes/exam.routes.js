@@ -1,27 +1,24 @@
 const express = require('express');
 const examController = require('../controllers/exam.controller');
+const authController = require('../controllers/auth.controller');
 
 const router = express.Router();
 
-// ======================== EXAM ROUTES ========================
+router.use(authController.protect);
 
-// GET all exams / POST create exam
 router.route('/')
   .get(examController.getAllExams)
-  .post(examController.createExam);
+  .post(authController.restrictTo('admin'), examController.createExam);
 
-// GET, UPDATE, DELETE exam by ID
 router.route('/:id')
-  .get(examController.getExamById) 
-  .put(examController.updateExam)
-  .delete(examController.hardDeleteExam);
+  .get(examController.getExamById)
+  .put(authController.restrictTo('admin'), examController.updateExam)
+  .delete(authController.restrictTo('admin'), examController.hardDeleteExam);
 
-// PATCH soft-delete exam
 router.route('/:id/soft-delete')
-  .patch(examController.softDeleteExam);
+  .patch(authController.restrictTo('admin'), examController.softDeleteExam);
 
-// PATCH restore exam
 router.route('/:id/restore')
-  .patch(examController.restoreExam);
+  .patch(authController.restrictTo('admin'), examController.restoreExam);
 
 module.exports = router;
