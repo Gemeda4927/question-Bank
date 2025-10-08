@@ -1,6 +1,5 @@
 const Course = require('../models/course.model');
 const Program = require('../models/program.model');
-const User = require('../models/user.model');
 
 // ======================== CREATE COURSE ========================
 exports.createCourse = async (req, res) => {
@@ -150,56 +149,6 @@ exports.hardDeleteCourse = async (req, res) => {
     await Program.findByIdAndUpdate(course.programId, { $pull: { courses: course._id } });
 
     res.status(200).json({ status: 'success', message: '❌ Course permanently deleted' });
-  } catch (error) {
-    res.status(400).json({ status: 'fail', message: error.message });
-  }
-};
-
-// ======================== SUBSCRIBE STUDENT TO COURSE/EXAM ========================
-exports.subscribeStudent = async (req, res) => {
-  try {
-    const { courseId, studentId, examId, paymentStatus = 'paid' } = req.body;
-
-    const course = await Course.findById(courseId);
-    if (!course || course.isDeleted) return res.status(404).json({ status: 'fail', message: 'Course not found' });
-
-    const student = await User.findById(studentId);
-    if (!student) return res.status(404).json({ status: 'fail', message: 'Student not found' });
-
-    // Subscribe to full course or specific exam
-    await student.subscribeToCourse(courseId, paymentStatus, examId);
-
-    res.status(200).json({
-      status: 'success',
-      message: examId
-        ? `🎉 Student ${student.name} subscribed to exam ${examId} of course ${course.name}`
-        : `🎉 Student ${student.name} subscribed to course ${course.name}`,
-    });
-  } catch (error) {
-    res.status(400).json({ status: 'fail', message: error.message });
-  }
-};
-
-// ======================== CHECK STUDENT ACCESS ========================
-exports.checkAccess = async (req, res) => {
-  try {
-    const { courseId, studentId, examId } = req.body;
-
-    const course = await Course.findById(courseId);
-    if (!course || course.isDeleted) return res.status(404).json({ status: 'fail', message: 'Course not found' });
-
-    const student = await User.findById(studentId);
-    if (!student) return res.status(404).json({ status: 'fail', message: 'Student not found' });
-
-    const hasAccess = student.hasAccessToCourse(courseId, examId);
-
-    res.status(200).json({
-      status: 'success',
-      data: { hasAccess },
-      message: hasAccess
-        ? '✅ Student has access'
-        : '❌ Student does not have access',
-    });
   } catch (error) {
     res.status(400).json({ status: 'fail', message: error.message });
   }

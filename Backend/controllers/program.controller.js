@@ -1,5 +1,5 @@
 const Program = require('../models/program.model');
-const Department = require('../models/department.model');
+const Faculty = require('../models/faculty.model');
 
 // ======================== CREATE PROGRAM ========================
 exports.createProgram = async (req, res) => {
@@ -8,41 +8,35 @@ exports.createProgram = async (req, res) => {
       name,
       code,
       description,
-      departmentId,
+      faculty,
       courses,
-      durationInYears,
-      level,
-      creditRequirement,
-      enrollmentLimit,
-      isFeatured,
+      type,
+      level
     } = req.body;
 
-    if (!departmentId) {
-      return res.status(400).json({ status: 'fail', message: 'departmentId is required' });
+    if (!faculty) {
+      return res.status(400).json({ status: 'fail', message: 'Faculty is required' });
     }
 
     const program = await Program.create({
       name,
       code,
       description,
-      departmentId,
-      courses: courses || null,
-      durationInYears,
-      level,
-      creditRequirement,
-      enrollmentLimit,
-      isFeatured: isFeatured || false,
+      faculty,
+      courses: courses || [],
+      type: type || 'Undergraduate',
+      level: level || '1'
     });
 
-    // Add program to department
-    await Department.findByIdAndUpdate(departmentId, {
-      $push: { programs: program._id },
+    // Add program to faculty
+    await Faculty.findByIdAndUpdate(faculty, {
+      $push: { programs: program._id }
     });
 
     res.status(201).json({
       status: 'success',
       message: '🎉 Program created successfully!',
-      data: program,
+      data: program
     });
   } catch (error) {
     res.status(400).json({ status: 'fail', message: error.message });
@@ -53,14 +47,13 @@ exports.createProgram = async (req, res) => {
 exports.getAllPrograms = async (req, res) => {
   try {
     const programs = await Program.find({ isDeleted: false })
-      .populate('departmentId', 'name code')
-      .populate('courses', 'name code')
-      .populate('students', 'name email'); // optional
+      .populate('faculty', 'name code')
+      .populate('courses', 'name code');
 
     res.status(200).json({
       status: 'success',
       results: programs.length,
-      data: programs,
+      data: programs
     });
   } catch (error) {
     res.status(400).json({ status: 'fail', message: error.message });
@@ -71,9 +64,8 @@ exports.getAllPrograms = async (req, res) => {
 exports.getProgram = async (req, res) => {
   try {
     const program = await Program.findById(req.params.id)
-      .populate('departmentId', 'name code')
-      .populate('courses', 'name code')
-      .populate('students', 'name email');
+      .populate('faculty', 'name code')
+      .populate('courses', 'name code');
 
     if (!program || program.isDeleted) {
       return res.status(404).json({ status: 'fail', message: 'Program not found' });
@@ -88,16 +80,25 @@ exports.getProgram = async (req, res) => {
 // ======================== UPDATE PROGRAM ========================
 exports.updateProgram = async (req, res) => {
   try {
-    const program = await Program.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
-      .populate('departmentId', 'name code')
-      .populate('courses', 'name code')
-      .populate('students', 'name email');
+    const { name, code, description, faculty, courses, type, level } = req.body;
+
+    const program = await Program.findByIdAndUpdate(
+      req.params.id,
+      { name, code, description, faculty, courses, type, level },
+      { new: true, runValidators: true }
+    )
+      .populate('faculty', 'name code')
+      .populate('courses', 'name code');
 
     if (!program || program.isDeleted) {
       return res.status(404).json({ status: 'fail', message: 'Program not found' });
     }
 
-    res.status(200).json({ status: 'success', message: '✅ Program updated', data: program });
+    res.status(200).json({
+      status: 'success',
+      message: '✅ Program updated successfully',
+      data: program
+    });
   } catch (error) {
     res.status(400).json({ status: 'fail', message: error.message });
   }
@@ -114,7 +115,11 @@ exports.softDeleteProgram = async (req, res) => {
 
     if (!program) return res.status(404).json({ status: 'fail', message: 'Program not found' });
 
-    res.status(200).json({ status: 'success', message: '🗑️ Program soft-deleted', data: program });
+    res.status(200).json({
+      status: 'success',
+      message: '🗑️ Program soft-deleted',
+      data: program
+    });
   } catch (error) {
     res.status(400).json({ status: 'fail', message: error.message });
   }
@@ -131,7 +136,11 @@ exports.restoreProgram = async (req, res) => {
 
     if (!program) return res.status(404).json({ status: 'fail', message: 'Program not found' });
 
-    res.status(200).json({ status: 'success', message: '♻️ Program restored', data: program });
+    res.status(200).json({
+      status: 'success',
+      message: '♻️ Program restored',
+      data: program
+    });
   } catch (error) {
     res.status(400).json({ status: 'fail', message: error.message });
   }
@@ -144,28 +153,10 @@ exports.hardDeleteProgram = async (req, res) => {
 
     if (!program) return res.status(404).json({ status: 'fail', message: 'Program not found' });
 
-    res.status(200).json({ status: 'success', message: '❌ Program permanently deleted' });
-  } catch (error) {
-    res.status(400).json({ status: 'fail', message: error.message });
-  }
-};
-
-// ======================== STUDENT SUBSCRIBE TO PROGRAM ========================
-exports.subscribeStudent = async (req, res) => {
-  try {
-    const { studentId } = req.body;
-
-    const program = await Program.findById(req.params.id);
-    if (!program || program.isDeleted) return res.status(404).json({ status: 'fail', message: 'Program not found' });
-
-    if (program.students.includes(studentId)) {
-      return res.status(400).json({ status: 'fail', message: 'Student already enrolled in this program' });
-    }
-
-    program.students.push(studentId);
-    await program.save();
-
-    res.status(200).json({ status: 'success', message: 'Student subscribed successfully', data: program });
+    res.status(200).json({
+      status: 'success',
+      message: '❌ Program permanently deleted'
+    });
   } catch (error) {
     res.status(400).json({ status: 'fail', message: error.message });
   }

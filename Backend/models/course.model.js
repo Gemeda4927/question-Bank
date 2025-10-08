@@ -40,25 +40,14 @@ const courseSchema = new mongoose.Schema(
       default: 'Bachelor',
     },
     prerequisites: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Course',
-      },
+      { type: mongoose.Schema.Types.ObjectId, ref: 'Course' }
     ],
     instructors: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-      },
+      { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
     ],
     exams: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Exam',
-      },
+      { type: mongoose.Schema.Types.ObjectId, ref: 'Exam' }
     ],
-
-
     subscribedStudents: [
       {
         studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
@@ -80,11 +69,6 @@ const courseSchema = new mongoose.Schema(
         ],
       },
     ],
-
-
-
-
-    
     isDeleted: {
       type: Boolean,
       default: false,
@@ -93,65 +77,55 @@ const courseSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// ====================== ADD STUDENT TO COURSE ======================
+// ====================== METHODS ======================
+
+// Add or update student subscription
 courseSchema.methods.addStudent = async function (userId, paymentStatus = 'paid') {
   const User = mongoose.model('User');
 
-  // Check if student already exists in course
-  let subStudent = this.subscribedStudents.find(
-    (s) => s.studentId.toString() === userId.toString()
-  );
-
-  if (!subStudent) {
+  let student = this.subscribedStudents.find(s => s.studentId.toString() === userId.toString());
+  if (!student) {
     this.subscribedStudents.push({ studentId: userId, coursePaymentStatus: paymentStatus });
-    await this.save();
   } else {
-    subStudent.coursePaymentStatus = paymentStatus;
-    await this.save();
+    student.coursePaymentStatus = paymentStatus;
   }
+  await this.save();
 
-  // Update User model
   const user = await User.findById(userId);
-  const alreadySubscribed = user.subscribedCourses.some(
-    (c) => c.courseId.toString() === this._id.toString()
-  );
-
-  if (!alreadySubscribed) {
+  let subCourse = user.subscribedCourses.find(c => c.courseId.toString() === this._id.toString());
+  if (!subCourse) {
     user.subscribedCourses.push({ courseId: this._id, paymentStatus });
-    await user.save();
   } else {
-    user.subscribedCourses = user.subscribedCourses.map((c) =>
-      c.courseId.toString() === this._id.toString() ? { ...c, paymentStatus } : c
-    );
-    await user.save();
+    subCourse.paymentStatus = paymentStatus;
   }
+  await user.save();
 
   return true;
 };
 
-// ====================== ADD EXAM PAYMENT ======================
+// Add or update exam payment for student
 courseSchema.methods.addExamPayment = async function (userId, examId, paymentStatus = 'paid') {
   const User = mongoose.model('User');
   const user = await User.findById(userId);
 
   // Update Course
-  let subStudent = this.subscribedStudents.find((s) => s.studentId.toString() === userId.toString());
-  if (!subStudent) {
-    subStudent = { studentId: userId, coursePaymentStatus: 'unpaid', examsPaid: [] };
-    this.subscribedStudents.push(subStudent);
+  let student = this.subscribedStudents.find(s => s.studentId.toString() === userId.toString());
+  if (!student) {
+    student = { studentId: userId, coursePaymentStatus: 'unpaid', examsPaid: [] };
+    this.subscribedStudents.push(student);
   }
-  if (!subStudent.examsPaid.some((e) => e.examId.toString() === examId.toString())) {
-    subStudent.examsPaid.push({ examId, paymentStatus });
+  if (!student.examsPaid.some(e => e.examId.toString() === examId.toString())) {
+    student.examsPaid.push({ examId, paymentStatus });
   }
   await this.save();
 
   // Update User
-  let subCourse = user.subscribedCourses.find((c) => c.courseId.toString() === this._id.toString());
+  let subCourse = user.subscribedCourses.find(c => c.courseId.toString() === this._id.toString());
   if (!subCourse) {
     subCourse = { courseId: this._id, paymentStatus: 'unpaid', examsPaid: [] };
     user.subscribedCourses.push(subCourse);
   }
-  if (!subCourse.examsPaid.some((e) => e.examId.toString() === examId.toString())) {
+  if (!subCourse.examsPaid.some(e => e.examId.toString() === examId.toString())) {
     subCourse.examsPaid.push({ examId, paymentStatus });
   }
   await user.save();
@@ -159,17 +133,15 @@ courseSchema.methods.addExamPayment = async function (userId, examId, paymentSta
   return true;
 };
 
-// ====================== CHECK ACCESS ======================
+// Check if student can access course or exam
 courseSchema.methods.canAccess = function (userId, examId = null) {
-  const student = this.subscribedStudents.find((s) => s.studentId.toString() === userId.toString());
+  const student = this.subscribedStudents.find(s => s.studentId.toString() === userId.toString());
   if (!student) return false;
 
-  // Full course payment grants full access
   if (student.coursePaymentStatus === 'paid') return true;
 
-  // Exam-level access
   if (examId) {
-    return student.examsPaid.some((e) => e.examId.toString() === examId.toString() && e.paymentStatus === 'paid');
+    return student.examsPaid.some(e => e.examId.toString() === examId.toString() && e.paymentStatus === 'paid');
   }
 
   return false;

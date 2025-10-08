@@ -1,10 +1,19 @@
-// controllers/university.controller.js
 const University = require('../models/university.model');
 
 // ================== CREATE UNIVERSITY ==================
 exports.createUniversity = async (req, res) => {
   try {
-    const university = await University.create(req.body);
+    const { name, location, description, type, mode, colleges } = req.body;
+
+    const university = await University.create({
+      name,
+      location,
+      description,
+      type,      // "Public" or "Private"
+      mode,      // "Sync" or "Async"
+      colleges: colleges || [] // allow empty array
+    });
+
     res.status(201).json({
       status: 'success',
       message: '🎉 University created successfully!',
@@ -18,11 +27,14 @@ exports.createUniversity = async (req, res) => {
 // ================== GET ALL UNIVERSITIES ==================
 exports.getAllUniversities = async (req, res) => {
   try {
-    const { search, location, sort, page = 1, limit = 10 } = req.query;
+    const { search, location, type, mode, sort, page = 1, limit = 10 } = req.query;
 
     const query = { isDeleted: false };
+
     if (search) query.name = { $regex: search, $options: 'i' };
     if (location) query.location = { $regex: location, $options: 'i' };
+    if (type) query.type = type;
+    if (mode) query.mode = mode;
 
     const skip = (page - 1) * limit;
     const sortOption = sort ? sort.split(',').join(' ') : '-createdAt';
@@ -32,8 +44,9 @@ exports.getAllUniversities = async (req, res) => {
       .skip(skip)
       .limit(Number(limit))
       .populate({
-        path: 'departments',
-        select: 'name code description'
+        path: 'colleges',
+        select: 'name code description',
+        options: { sort: { name: 1 } } // optional sorting
       });
 
     const total = await University.countDocuments(query);
@@ -58,7 +71,7 @@ exports.getUniversity = async (req, res) => {
   try {
     const university = await University.findById(req.params.id)
       .populate({
-        path: 'departments',
+        path: 'colleges',
         select: 'name code description'
       });
 
@@ -78,9 +91,11 @@ exports.getUniversity = async (req, res) => {
 // ================== UPDATE UNIVERSITY ==================
 exports.updateUniversity = async (req, res) => {
   try {
+    const { name, location, description, type, mode, colleges } = req.body;
+
     const university = await University.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      { name, location, description, type, mode, colleges: colleges || [] },
       { new: true, runValidators: true }
     );
 
@@ -171,8 +186,10 @@ exports.getUniversityStats = async (req, res) => {
         $project: {
           name: 1,
           location: 1,
+          type: 1,
+          mode: 1,
           createdAt: 1,
-          totalDepartments: { $size: '$departments' }
+          totalColleges: { $size: '$colleges' }
         }
       }
     ]);
