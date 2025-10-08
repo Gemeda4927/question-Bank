@@ -25,7 +25,8 @@ exports.signup = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      token: generateToken(user)
+      token: generateToken(user),
+      user
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -44,7 +45,8 @@ exports.login = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      token: generateToken(user)
+      token: generateToken(user),
+      user
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -60,7 +62,6 @@ exports.forgotPassword = async (req, res) => {
     const resetToken = user.getResetPasswordToken();
     await user.save({ validateBeforeSave: false });
 
-    // In production, send email with resetUrl
     const resetUrl = `${req.protocol}://${req.get('host')}/api/auth/resetPassword/${resetToken}`;
 
     res.status(200).json({
@@ -96,7 +97,8 @@ exports.resetPassword = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      token: generateToken(user)
+      token: generateToken(user),
+      user
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -109,7 +111,7 @@ exports.resetPassword = async (req, res) => {
 exports.protect = async (req, res, next) => {
   let token;
 
-  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+  if (req.headers.authorization?.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
   }
 
@@ -119,7 +121,14 @@ exports.protect = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // Contains id & role
+
+    // Fetch full user from DB
+    const user = await User.findById(decoded.id);
+    if (!user || user.isDeleted) {
+      return res.status(401).json({ message: 'User not found in database' });
+    }
+
+    req.user = user; // Attach full user
     next();
   } catch (error) {
     res.status(401).json({ message: 'Not authorized, token failed' });
