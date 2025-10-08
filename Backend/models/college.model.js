@@ -13,6 +13,12 @@ const collegeSchema = new mongoose.Schema(
       unique: true,
       trim: true
     },
+     price: {
+      type: Number,
+      required: [true, 'Course price is required'],
+      min: [1, 'Course price must be greater than 0']
+    },
+
     description: { type: String, trim: true },
     university: {
       type: mongoose.Schema.Types.ObjectId,
@@ -20,7 +26,7 @@ const collegeSchema = new mongoose.Schema(
       required: true
     },
     faculties: [
-      { type: mongoose.Schema.Types.ObjectId, ref: 'Faculty', default: [] } 
+      { type: mongoose.Schema.Types.ObjectId, ref: 'Faculty', default: [] } // empty by default
     ],
     isDeleted: { type: Boolean, default: false },
     deletedAt: Date

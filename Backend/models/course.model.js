@@ -18,6 +18,11 @@ const courseSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    price: {
+      type: Number,
+      required: [true, 'Course price is required'],
+      min: [1, 'Course price must be greater than 0'],
+    },
     programId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Program',

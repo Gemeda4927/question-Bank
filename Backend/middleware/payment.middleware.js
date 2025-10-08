@@ -2,68 +2,65 @@ const axios = require('axios');
 const Course = require('../models/course.model');
 const User = require('../models/user.model');
 
-// ======================== CREATE COURSE PAYMENT ========================
+/* ======================== HELPERS ======================== */
+
+// Clean and validate strings for Chapa
+const getCleanString = (value, defaultValue = 'N/A') => {
+  if (value === null || value === undefined) return defaultValue;
+  if (Array.isArray(value)) return value[0] ? String(value[0]).trim() : defaultValue;
+  return String(value).trim() || defaultValue;
+};
+
+// Sanitize description (letters, numbers, hyphens, underscores, spaces, dots)
+const sanitizeDescription = (text) => {
+  return text.replace(/[^a-zA-Z0-9\-_ .]/g, ' ').replace(/\s+/g, ' ').trim();
+};
+
+// Truncate title to 16 chars
+const truncateTitle = (title) => title.substring(0, 16).trim();
+
+/* ======================== CREATE COURSE PAYMENT ======================== */
 exports.createCoursePayment = async (req, res, next) => {
   try {
-    if (!req.user) {
-      return res.status(401).json({ status: 'fail', message: 'User not authenticated' });
-    }
+    if (!req.user) return res.status(401).json({ status: 'fail', message: 'User not authenticated' });
+
+    const user = await User.findById(req.user._id).select('name email role');
+    if (!user) return res.status(404).json({ status: 'fail', message: 'User not found' });
+    if (user.role !== 'student') return res.status(403).json({ status: 'fail', message: 'Only students can pay for courses' });
 
     const { courseId } = req.body;
-    if (!courseId) {
-      return res.status(400).json({ status: 'fail', message: 'Course ID is required' });
-    }
-
-    // Only students can pay
-    if (req.user.role !== 'student') {
-      return res.status(403).json({ status: 'fail', message: 'Only students can make course payments' });
-    }
+    if (!courseId) return res.status(400).json({ status: 'fail', message: 'Course ID is required' });
 
     const course = await Course.findById(courseId);
-    if (!course) {
-      return res.status(404).json({ status: 'fail', message: 'Course not found' });
-    }
+    if (!course) return res.status(404).json({ status: 'fail', message: 'Course not found' });
+    if (!course.price || course.price <= 0) return res.status(400).json({ status: 'fail', message: 'Invalid or missing course price' });
 
-    // Amount to pay
-    const amount = course.price || 1000; // fallback if price not set
+    const alreadySubscribed = course.subscribedStudents.some(s => s.studentId.toString() === user._id.toString());
+    if (alreadySubscribed) return res.status(400).json({ status: 'fail', message: 'You are already subscribed to this course' });
 
-    // Check if student already subscribed
-    const alreadySubscribed = course.subscribedStudents.some(
-      s => s.studentId.toString() === req.user._id.toString()
-    );
-    if (alreadySubscribed) {
-      return res.status(400).json({ status: 'fail', message: 'You are already subscribed to this course' });
-    }
-
-    // Fallback for user name
-    const fullName = req.user.name || 'Student User';
-    const nameParts = fullName.split(' ');
-    const firstName = nameParts[0];
-    const lastName = nameParts.slice(1).join(' ') || 'User';
-
-    // Short tx_ref for Chapa
-    const shortId = courseId.toString().slice(-6); // last 6 chars
-    const tx_ref = `cr-${shortId}-${Date.now().toString().slice(-8)}`;
-
-    // const returnUrl = process.env.FRONTEND_URL || 'https://your-frontend.com';
-    const courseTitle = course.name.length > 13 ? course.name.slice(0, 13) + '...' : course.name;
+    const [firstName, ...rest] = getCleanString(user.name).split(' ');
+    const lastName = rest.join(' ') || 'User';
+    const tx_ref = `course-${courseId}-${Date.now()}`;
 
     const paymentData = {
-      amount: Math.round(amount),
+      amount: Math.round(Number(course.price)),
       currency: 'ETB',
-      email: req.user.email || `testuser${Date.now()}@mail.com`, // fallback email
-      first_name: firstName,
-      last_name: lastName,
-      tx_ref,
+      email: getCleanString(user.email),
+      first_name: getCleanString(firstName, 'Customer'),
+      last_name: getCleanString(lastName, 'User'),
+      tx_ref: getCleanString(tx_ref),
       callback_url: `${process.env.BASE_URL}/api/v1/payments/webhook`,
-    //   return_url: `${returnUrl}/payment-success`,
       customization: {
-        title: courseTitle,
-        description: `Course ${course.code}`
+        title: truncateTitle(getCleanString(course.name, 'Course Payment')),
+        description: sanitizeDescription(getCleanString(course.code, 'COURSE'))
+      },
+      metadata: {
+        courseId: course._id.toString(),
+        userId: user._id.toString()
       }
     };
 
-    console.log('Payment data being sent:', paymentData);
+    console.log('🔍 Cleaned payment data:', paymentData);
 
     const response = await axios.post(
       'https://api.chapa.co/v1/transaction/initialize',
@@ -73,102 +70,117 @@ exports.createCoursePayment = async (req, res, next) => {
           Authorization: `Bearer ${process.env.CHAPA_SECRET_KEY}`,
           'Content-Type': 'application/json'
         },
-        timeout: 15000
+        timeout: 15000,
+        validateStatus: status => status < 500
       }
     );
+
+    if (response.data.status !== 'success' || !response.data.data?.checkout_url) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'Payment initialization failed',
+        details: response.data
+      });
+    }
 
     res.status(200).json({
       status: 'success',
       message: '💳 Payment initialized',
-      data: response.data,
       checkout_url: response.data.data.checkout_url
     });
 
   } catch (error) {
-    console.error('Payment initialization error:', {
-      message: error.message,
-      response: error.response?.data,
-      status: error.response?.status
-    });
-
-    if (error.response?.status === 400) {
-      return res.status(400).json({
-        status: 'fail',
-        message: 'Invalid payment request. Check your details.',
-        details: error.response.data
-      });
+    console.error('❌ Payment initialization error:', error);
+    if (error.response?.data) {
+      return res.status(error.response.status).json({ status: 'fail', message: 'Payment initialization failed', details: error.response.data });
     }
-
     next(error);
   }
 };
 
-// ======================== VERIFY PAYMENT ========================
+/* ======================== VERIFY PAYMENT ======================== */
 exports.verifyPayment = async (tx_ref) => {
   try {
     const response = await axios.get(
       `https://api.chapa.co/v1/transaction/verify/${tx_ref}`,
-      { headers: { Authorization: `Bearer ${process.env.CHAPA_SECRET_KEY}` }, timeout: 10000 }
+      {
+        headers: { Authorization: `Bearer ${process.env.CHAPA_SECRET_KEY}` },
+        timeout: 10000,
+        validateStatus: status => status < 500
+      }
     );
     return response.data;
   } catch (error) {
-    console.error('Payment verification failed:', error.message);
+    console.error('❌ Payment verification failed:', error);
     return null;
   }
 };
 
-// ======================== CHAPA WEBHOOK ========================
-exports.handleWebhook = async (req, res, next) => {
-    console.log('Webhook payload:', req.body);
+/* ======================== CHAPA WEBHOOK ======================== */
+exports.handleWebhook = async (req, res) => {
+  // Support GET (sandbox/test) and POST (production)
+  const data = req.body && Object.keys(req.body).length ? req.body : req.query;
+
+  console.log('📥 Webhook payload received:', JSON.stringify(data, null, 2));
+
+  const { trx_ref, tx_ref, status, metadata } = data;
+
+  // Sandbox / GET testing
+  if (req.method === 'GET' || process.env.NODE_ENV === 'development') {
+    console.warn('⚠️ Sandbox/test webhook detected.');
+    
+    // Optional: Uncomment to update DB in test mode
+    // await updateTestDatabase(data);
+
+    return res.status(200).json({ status: 'success', message: 'Sandbox webhook received' });
+  }
+
+  // Validate reference
+  if (!tx_ref && !trx_ref) {
+    return res.status(400).json({ status: 'fail', message: 'Missing transaction reference' });
+  }
+  const reference = tx_ref || trx_ref;
+
+  // Validate metadata
+  if (!metadata?.courseId || !metadata?.userId) {
+    return res.status(400).json({ status: 'fail', message: 'Missing metadata (courseId/userId)' });
+  }
+
   try {
-    const { tx_ref, status, customer } = req.body;
-    console.log('Webhook received:', { tx_ref, status });
+    // Verify payment with Chapa
+    const verification = await exports.verifyPayment(reference);
 
-    if (!tx_ref || !customer?.email) {
-      return res.status(400).json({ status: 'fail', message: 'Invalid webhook data' });
-    }
-
-    const verification = await exports.verifyPayment(tx_ref);
     if (!verification || verification.status !== 'success' || verification.data.status !== 'success') {
       return res.status(400).json({ status: 'fail', message: 'Payment not verified' });
     }
 
-    // Extract course short ID
-    const match = tx_ref.match(/^cr-(.+)-(\d+)$/);
-    if (!match) return res.status(400).json({ status: 'fail', message: 'Invalid tx_ref format' });
-    const shortId = match[1];
-
-    const courses = await Course.find();
-    const course = courses.find(c => c._id.toString().endsWith(shortId));
+    // Find course and user
+    const course = await Course.findById(metadata.courseId);
     if (!course) return res.status(404).json({ status: 'fail', message: 'Course not found' });
 
-    const user = await User.findOne({ email: customer.email });
+    const user = await User.findById(metadata.userId);
     if (!user) return res.status(404).json({ status: 'fail', message: 'Student not found' });
 
-    // Update course subscription
-    const studentIndex = course.subscribedStudents.findIndex(
-      s => s.studentId.toString() === user._id.toString()
-    );
-    if (studentIndex === -1) {
-      course.subscribedStudents.push({ studentId: user._id, coursePaymentStatus: 'paid', enrolledAt: new Date(), examsPaid: [] });
-    } else {
-      course.subscribedStudents[studentIndex].coursePaymentStatus = 'paid';
-      course.subscribedStudents[studentIndex].enrolledAt = new Date();
-    }
+    // Add or update student enrollment
+    const studentIndex = course.subscribedStudents.findIndex(s => s.studentId.toString() === user._id.toString());
+    const enrollmentData = { studentId: user._id, coursePaymentStatus: 'paid', enrolledAt: new Date(), examsPaid: [] };
+
+    if (studentIndex === -1) course.subscribedStudents.push(enrollmentData);
+    else course.subscribedStudents[studentIndex] = { ...course.subscribedStudents[studentIndex], ...enrollmentData };
+
     await course.save();
 
-    // Update user subscribed courses
+    // Update user's subscribed courses
     if (!user.subscribedCourses.includes(course._id)) {
       user.subscribedCourses.push(course._id);
       await user.save();
     }
 
-    console.log('Payment successful for:', { user: user.email, course: course.name, tx_ref });
-
-    res.status(200).json({ status: 'success', message: '✅ Payment verified and recorded' });
+    console.log('✅ Payment recorded:', { user: user.email, course: course.name, tx_ref: reference });
+    res.status(200).json({ status: 'success', message: 'Payment verified and recorded' });
 
   } catch (error) {
-    console.error('Webhook error:', error);
-    next(error);
+    console.error('❌ Webhook processing error:', error);
+    res.status(500).json({ status: 'error', message: 'Internal server error' });
   }
 };
