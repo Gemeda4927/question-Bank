@@ -1,23 +1,39 @@
 const express = require('express');
 const collegeController = require('../controllers/college.controller');
+const authController = require('../controllers/auth.controller');
 
 const router = express.Router();
 
-router
-  .post('/', collegeController.createCollege)
-  .get('/', collegeController.getAllColleges);
+router.use(authController.protect);
 
 router
-  .get('/:id', collegeController.getCollege)
-  .put('/:id', collegeController.updateCollege);
+  .route('/')
+  .post(authController.restrictTo('admin'), collegeController.createCollege)
+  .get(collegeController.getAllColleges);
 
 router
-  .delete('/soft/:id', collegeController.softDeleteCollege)
-  .patch('/restore/:id', collegeController.restoreCollege)
-  .delete('/hard/:id', collegeController.hardDeleteCollege);
+  .route('/:id')
+  .get(collegeController.getCollege)
+  .put(authController.restrictTo('admin'), collegeController.updateCollege);
 
 router
-  .patch('/:id/faculty', collegeController.addFaculty)
-  .get('/stats/all', collegeController.getCollegeStats);
+  .route('/soft/:id')
+  .delete(authController.restrictTo('admin'), collegeController.softDeleteCollege);
+
+router
+  .route('/restore/:id')
+  .patch(authController.restrictTo('admin'), collegeController.restoreCollege);
+
+router
+  .route('/hard/:id')
+  .delete(authController.restrictTo('admin'), collegeController.hardDeleteCollege);
+
+router
+  .route('/:id/faculty')
+  .patch(authController.restrictTo('admin'), collegeController.addFaculty);
+
+router
+  .route('/stats/all')
+  .get(collegeController.getCollegeStats);
 
 module.exports = router;

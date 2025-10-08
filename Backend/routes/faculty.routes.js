@@ -1,39 +1,36 @@
 const express = require('express');
 const facultyController = require('../controllers/faculty.controller');
+const authController = require('../controllers/auth.controller');
 
 const router = express.Router();
 
-// ================== FACULTY CRUD ==================
+router.use(authController.protect);
 
-// Create a faculty
-router.post('/', facultyController.createFaculty);
+router
+  .route('/')
+  .post(authController.restrictTo('admin'), facultyController.createFaculty)
+  .get(facultyController.getAllFaculties);
 
-// Get all faculties (with optional search, filter, sort, pagination)
-router.get('/', facultyController.getAllFaculties);
+router
+  .route('/:id')
+  .get(facultyController.getFaculty)
+  .put(authController.restrictTo('admin'), facultyController.updateFaculty)
+  .delete(authController.restrictTo('admin'), facultyController.hardDeleteFaculty);
 
-// Get single faculty by ID
-router.get('/:id', facultyController.getFaculty);
+router
+  .route('/:id/soft-delete')
+  .delete(authController.restrictTo('admin'), facultyController.softDeleteFaculty);
 
-// Update faculty
-router.put('/:id', facultyController.updateFaculty);
+router
+  .route('/:id/restore')
+  .patch(authController.restrictTo('admin'), facultyController.restoreFaculty);
 
-// Soft delete faculty
-router.delete('/soft/:id', facultyController.softDeleteFaculty);
+router
+  .route('/:id/program')
+  .patch(authController.restrictTo('admin'), facultyController.addProgram);
 
-// Restore soft-deleted faculty
-router.patch('/restore/:id', facultyController.restoreFaculty);
-
-// Hard delete faculty
-router.delete('/hard/:id', facultyController.hardDeleteFaculty);
-
-// ================== ADD PROGRAM ==================
-
-// Push/add program to a faculty
-router.patch('/:id/program', facultyController.addProgram);
-
-// ================== STATISTICS ==================
-
-// Get faculty statistics
-router.get('/stats/all', facultyController.getFacultyStats);
+router
+  .route('/stats/all')
+  .get(facultyController.getFacultyStats);
 
 module.exports = router;
