@@ -11,6 +11,7 @@ const examRouter = require('./routes/exam.routes');
 const departmentRouter = require('./routes/department.routes');
 const programRouter = require('./routes/program.routes');
 const courseRouter = require('./routes/course.routes');
+const paymentRouter = require('./routes/payment.routes');
 
 const app = express();
 
@@ -30,7 +31,6 @@ app.use('/api/v1/exams', examRouter);
 app.use('/api/v1/departments', departmentRouter);
 app.use('/api/v1/programs', programRouter);
 app.use('/api/v1/courses', courseRouter);
-
-
+app.use('/api/v1/payments', paymentRouter); 
 
 module.exports = app;
