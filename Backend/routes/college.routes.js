@@ -3,37 +3,21 @@ const collegeController = require('../controllers/college.controller');
 
 const router = express.Router();
 
-// ================== COLLEGE CRUD ==================
+router
+  .post('/', collegeController.createCollege)
+  .get('/', collegeController.getAllColleges);
 
-// Create a college
-router.post('/', collegeController.createCollege);
+router
+  .get('/:id', collegeController.getCollege)
+  .put('/:id', collegeController.updateCollege);
 
-// Get all colleges (with optional search, filter, sort, pagination)
-router.get('/', collegeController.getAllColleges);
+router
+  .delete('/soft/:id', collegeController.softDeleteCollege)
+  .patch('/restore/:id', collegeController.restoreCollege)
+  .delete('/hard/:id', collegeController.hardDeleteCollege);
 
-// Get single college by ID
-router.get('/:id', collegeController.getCollege);
-
-// Update college
-router.put('/:id', collegeController.updateCollege);
-
-// Soft delete college
-router.delete('/soft/:id', collegeController.softDeleteCollege);
-
-// Restore soft-deleted college
-router.patch('/restore/:id', collegeController.restoreCollege);
-
-// Hard delete college
-router.delete('/hard/:id', collegeController.hardDeleteCollege);
-
-// ================== ADD FACULTY ==================
-
-// Push/add faculty to a college
-router.patch('/:id/faculty', collegeController.addFaculty);
-
-// ================== STATISTICS ==================
-
-// Get college statistics
-router.get('/stats/all', collegeController.getCollegeStats);
+router
+  .patch('/:id/faculty', collegeController.addFaculty)
+  .get('/stats/all', collegeController.getCollegeStats);
 
 module.exports = router;
