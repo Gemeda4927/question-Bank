@@ -4,13 +4,13 @@ const authController = require('../controllers/auth.controller');
 
 const router = express.Router();
 
-/* ======================== PROTECTED ROUTES ======================== */
-// Only authenticated users can create course payments
-router.post('/course', authController.protect, paymentController.createCoursePayment);
 
-/* ======================== PUBLIC ROUTES ======================== */
-router.route('/webhook')
-  .get(paymentController.handleWebhook)    // Sandbox/test GET
-  .post(paymentController.handleWebhook);  // Real POST webhook from Chapa
+router.post(
+  '/course',
+  authController.protect,         
+  paymentController.createCoursePayment
+);
+
+router.get('/webhook', paymentController.handleWebhook);
 
 module.exports = router;

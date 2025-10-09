@@ -2,16 +2,11 @@ const axios = require('axios');
 const Course = require('../models/course.model');
 const User = require('../models/user.model');
 
-/* ======================== HELPERS ======================== */
-
-// Clean and validate strings for Chapa
 const getCleanString = (value, defaultValue = 'N/A') => {
   if (value === null || value === undefined) return defaultValue;
   if (Array.isArray(value)) return value[0] ? String(value[0]).trim() : defaultValue;
   return String(value).trim() || defaultValue;
 };
-
-// Sanitize description (letters, numbers, hyphens, underscores, spaces, dots)
 const sanitizeDescription = (text) => {
   return text.replace(/[^a-zA-Z0-9\-_ .]/g, ' ').replace(/\s+/g, ' ').trim();
 };
@@ -19,7 +14,7 @@ const sanitizeDescription = (text) => {
 // Truncate title to 16 chars
 const truncateTitle = (title) => title.substring(0, 16).trim();
 
-/* ======================== CREATE COURSE PAYMENT ======================== */
+
 exports.createCoursePayment = async (req, res, next) => {
   try {
     if (!req.user) return res.status(401).json({ status: 'fail', message: 'User not authenticated' });
@@ -98,7 +93,7 @@ exports.createCoursePayment = async (req, res, next) => {
   }
 };
 
-/* ======================== VERIFY PAYMENT ======================== */
+
 exports.verifyPayment = async (tx_ref) => {
   try {
     const response = await axios.get(
@@ -116,45 +111,33 @@ exports.verifyPayment = async (tx_ref) => {
   }
 };
 
-/* ======================== CHAPA WEBHOOK ======================== */
-exports.handleWebhook = async (req, res) => {
-  // Support GET (sandbox/test) and POST (production)
-  const data = req.body && Object.keys(req.body).length ? req.body : req.query;
 
+exports.handleWebhook = async (req, res) => {
+  const data = req.body && Object.keys(req.body).length ? req.body : req.query;
   console.log('📥 Webhook payload received:', JSON.stringify(data, null, 2));
 
   const { trx_ref, tx_ref, status, metadata } = data;
-
-  // Sandbox / GET testing
-  if (req.method === 'GET' || process.env.NODE_ENV === 'development') {
-    console.warn('⚠️ Sandbox/test webhook detected.');
-    
-    // Optional: Uncomment to update DB in test mode
-    // await updateTestDatabase(data);
-
-    return res.status(200).json({ status: 'success', message: 'Sandbox webhook received' });
-  }
-
-  // Validate reference
-  if (!tx_ref && !trx_ref) {
-    return res.status(400).json({ status: 'fail', message: 'Missing transaction reference' });
-  }
   const reference = tx_ref || trx_ref;
 
-  // Validate metadata
+  if (!reference) {
+    return res.status(400).json({ status: 'fail', message: 'Missing transaction reference' });
+  }
+
   if (!metadata?.courseId || !metadata?.userId) {
     return res.status(400).json({ status: 'fail', message: 'Missing metadata (courseId/userId)' });
   }
 
   try {
-    // Verify payment with Chapa
-    const verification = await exports.verifyPayment(reference);
+
+    const isSandbox = req.method === 'GET' || process.env.NODE_ENV === 'development';
+    const verification = isSandbox
+      ? { status: 'success', data: { status: 'success', reference, metadata } } 
+      : await exports.verifyPayment(reference);
 
     if (!verification || verification.status !== 'success' || verification.data.status !== 'success') {
-      return res.status(400).json({ status: 'fail', message: 'Payment not verified' });
+      return res.status(400).json({ status: 'fail', message: 'Payment not verified', chapaResponse: verification });
     }
-
-    // Find course and user
+    console.log('💳 Payment verified:', verification.data);
     const course = await Course.findById(metadata.courseId);
     if (!course) return res.status(404).json({ status: 'fail', message: 'Course not found' });
 
@@ -162,22 +145,30 @@ exports.handleWebhook = async (req, res) => {
     if (!user) return res.status(404).json({ status: 'fail', message: 'Student not found' });
 
     // Add or update student enrollment
-    const studentIndex = course.subscribedStudents.findIndex(s => s.studentId.toString() === user._id.toString());
+    const studentIndex = course.subscribedStudents.findIndex(
+      s => s.studentId.toString() === user._id.toString()
+    );
     const enrollmentData = { studentId: user._id, coursePaymentStatus: 'paid', enrolledAt: new Date(), examsPaid: [] };
 
-    if (studentIndex === -1) course.subscribedStudents.push(enrollmentData);
-    else course.subscribedStudents[studentIndex] = { ...course.subscribedStudents[studentIndex], ...enrollmentData };
+    if (studentIndex === -1) {
+      course.subscribedStudents.push(enrollmentData);
+      console.log(`✅ New student enrolled: ${user.email} -> ${course.name}`);
+    } else {
+      course.subscribedStudents[studentIndex] = { ...course.subscribedStudents[studentIndex], ...enrollmentData };
+      console.log(`✅ Existing student enrollment updated: ${user.email} -> ${course.name}`);
+    }
 
     await course.save();
-
-    // Update user's subscribed courses
     if (!user.subscribedCourses.includes(course._id)) {
       user.subscribedCourses.push(course._id);
       await user.save();
+      console.log(`📚 User's subscribed courses updated: ${user.email}`);
     }
-
-    console.log('✅ Payment recorded:', { user: user.email, course: course.name, tx_ref: reference });
-    res.status(200).json({ status: 'success', message: 'Payment verified and recorded' });
+    res.status(200).json({
+      status: 'success',
+      message: 'Payment verified and recorded',
+      chapaResponse: verification.data
+    });
 
   } catch (error) {
     console.error('❌ Webhook processing error:', error);

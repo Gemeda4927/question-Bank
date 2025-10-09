@@ -2,46 +2,43 @@ const mongoose = require('mongoose');
 
 const questionSchema = new mongoose.Schema(
   {
-    exam: {
+    examId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Exam',
-      required: [true, 'Exam ID is required']
+      required: [true, 'Question must belong to an exam'],
     },
-    questionText: {
+    text: {
       type: String,
       required: [true, 'Question text is required'],
-      trim: true
+      trim: true,
     },
-    questionType: {
+    type: {
       type: String,
-      enum: ['MCQ', 'TrueFalse', 'Descriptive'],
-      default: 'MCQ'
+      enum: ['multiple-choice', 'true-false', 'short-answer'],
+      default: 'multiple-choice',
     },
     options: [
       {
-        optionText: { type: String, trim: true },
-        isCorrect: { type: Boolean, default: false }
-      }
+        type: String,
+      },
     ],
+    correctAnswer: {
+      type: String,
+      required: function () {
+        return this.type !== 'short-answer'; 
+      },
+    },
     marks: {
       type: Number,
       default: 1,
-      min: [0, 'Marks cannot be negative']
-    },
-    image: {
-      type: String, // URL or path to the image
-      default: null
+      min: 0,
     },
     isDeleted: {
       type: Boolean,
-      default: false
+      default: false,
     },
-    deletedAt: Date
   },
   { timestamps: true }
 );
-
-// Optional: unique index to prevent duplicate questions for same exam
-questionSchema.index({ exam: 1, questionText: 1 }, { unique: true });
 
 module.exports = mongoose.model('Question', questionSchema);
