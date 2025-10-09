@@ -25,13 +25,21 @@ const questionSchema = new mongoose.Schema(
     correctAnswer: {
       type: String,
       required: function () {
-        return this.type !== 'short-answer'; 
+        return this.type !== 'short-answer';
       },
     },
     marks: {
       type: Number,
       default: 1,
       min: 0,
+    },
+    category: {
+      type: String,
+      trim: true,
+    },
+    imageUrl: {
+      type: String, 
+      trim: true,
     },
     isDeleted: {
       type: Boolean,
