@@ -19,6 +19,12 @@ const examSchema = new mongoose.Schema(
       ref: 'Course',
       required: [true, 'Exam must belong to a course'],
     },
+    type: {
+      type: String,
+      enum: ['midterm', 'final', 'quiz', 'assignment'],
+      default: 'final',
+      trim: true,
+    },
     description: {
       type: String,
       trim: true,
@@ -41,6 +47,12 @@ const examSchema = new mongoose.Schema(
       required: true,
       min: 0,
     },
+    questions: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Question',
+      },
+    ],
     subscribedStudents: [
       {
         studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
@@ -100,5 +112,12 @@ examSchema.methods.canAccess = function (studentId) {
     (s) => s.studentId.toString() === studentId.toString() && s.paymentStatus === 'paid'
   );
 };
+
+// ====================== VIRTUAL POPULATE QUESTIONS ======================
+examSchema.virtual('examQuestions', {
+  ref: 'Question',
+  localField: '_id',
+  foreignField: 'examId',
+});
 
 module.exports = mongoose.model('Exam', examSchema);
