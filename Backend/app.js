@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const path = require('path');
+const cors = require('cors'); // <-- import cors
 
 // ================== IMPORT ROUTERS ==================
 const userRouter = require('./routes/user.routes');
@@ -21,6 +22,12 @@ app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' })); 
 app.use(express.static(path.join(__dirname, 'public')));
 
+// ================== CORS ==================
+app.use(cors({
+  origin: 'http://localhost:3000', 
+  credentials: true,               
+}));
+
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev')); 
 }
@@ -36,6 +43,5 @@ app.use('/api/v1/programs', programRouter);
 app.use('/api/v1/courses', courseRouter);
 app.use('/api/v1/payments', paymentRouter); 
 app.use('/api/v1/questions', questionRouter);  
-
 
 module.exports = app;
