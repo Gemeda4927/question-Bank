@@ -1,56 +1,128 @@
-'use client';
-import { ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
+"use client"
+
+import { useState, type ReactNode } from "react"
+import { useRouter, usePathname } from "next/navigation"
+import {
+  LayoutDashboard,
+  Users,
+  GraduationCap,
+  BookOpen,
+  Building2,
+  School,
+  UserCog,
+  CreditCard,
+  FileText,
+  HelpCircle,
+  LogOut,
+  Menu,
+  X,
+  ChevronRight,
+} from "lucide-react"
 
 interface AdminLayoutProps {
-  children: ReactNode;
+  children: ReactNode
 }
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
-  const router = useRouter();
+  const router = useRouter()
+  const pathname = usePathname()
+  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    router.replace('/login');
-  };
+    localStorage.removeItem("token")
+    router.replace("/login")
+  }
+
+  const menuItems = [
+    { name: "Dashboard", path: "/dashboard/admin", icon: LayoutDashboard },
+    { name: "Users", path: "/dashboard/admin/users", icon: Users },
+    { name: "Universities", path: "/dashboard/admin/universities", icon: GraduationCap },
+    { name: "Programs", path: "/dashboard/admin/programs", icon: BookOpen },
+    { name: "Colleges", path: "/dashboard/admin/colleges", icon: Building2 },
+    { name: "Courses", path: "/dashboard/admin/courses", icon: School },
+    { name: "Faculty", path: "/dashboard/admin/faculty", icon: UserCog },
+    { name: "Exams", path: "/dashboard/admin/exams", icon: FileText },
+    { name: "Questions", path: "/dashboard/admin/questions", icon: HelpCircle },
+    { name: "Payments", path: "/dashboard/admin/payments", icon: CreditCard },
+  ]
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
-      <aside className="w-64 bg-blue-700 text-white flex flex-col">
-        <div className="p-6 text-2xl font-bold">Admin Panel</div>
-        <nav className="flex-1 px-4 space-y-2">
+      <aside
+        className={`${
+          sidebarOpen ? "w-64" : "w-20"
+        } bg-white border-r border-gray-200 flex flex-col transition-all duration-300 shadow-sm`}
+      >
+        {/* Header */}
+        <div className="p-6 flex items-center justify-between border-b border-gray-200">
+          {sidebarOpen && (
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
+                <GraduationCap className="w-6 h-6 text-white" />
+              </div>
+              <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                ExamB
+              </span>
+            </div>
+          )}
           <button
-            className="block w-full text-left px-3 py-2 rounded hover:bg-blue-600 transition"
-            onClick={() => router.push('/dashboard/admin')}
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            Dashboard
+            {sidebarOpen ? (
+              <X className="w-5 h-5 text-gray-600" />
+            ) : (
+              <Menu className="w-5 h-5 text-gray-600" />
+            )}
           </button>
-          <button
-            className="block w-full text-left px-3 py-2 rounded hover:bg-blue-600 transition"
-            onClick={() => router.push('/dashboard/admin/users')}
-          >
-            Users
-          </button>
-          <button
-            className="block w-full text-left px-3 py-2 rounded hover:bg-blue-600 transition"
-            onClick={() => router.push('/dashboard/admin/exams')}
-          >
-            Exams
-          </button>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+          {menuItems.map((item) => {
+            const Icon = item.icon
+            const isActive = pathname === item.path
+            return (
+              <button
+                key={item.name}
+                onClick={() => router.push(item.path)}
+                title={!sidebarOpen ? item.name : ""}
+                className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl transition-all group ${
+                  isActive
+                    ? "bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg shadow-purple-500/30"
+                    : "hover:bg-gray-100 text-gray-700"
+                }`}
+              >
+                <Icon className="w-5 h-5 flex-shrink-0" />
+                {sidebarOpen && (
+                  <>
+                    <span className="text-sm font-medium flex-1 text-left">{item.name}</span>
+                    {isActive && <ChevronRight className="w-4 h-4" />}
+                  </>
+                )}
+              </button>
+            )
+          })}
         </nav>
-        <button
-          onClick={handleLogout}
-          className="m-4 px-3 py-2 bg-red-600 rounded hover:bg-red-700 transition"
-        >
-          Logout
-        </button>
+
+        {/* Logout Button */}
+        <div className="p-3 border-t border-gray-200">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl bg-gradient-to-r from-red-500 to-rose-600 text-white hover:shadow-lg hover:shadow-red-500/30 transition-all"
+            title={!sidebarOpen ? "Logout" : ""}
+          >
+            <LogOut className="w-5 h-5 flex-shrink-0" />
+            {sidebarOpen && <span className="text-sm font-medium">Logout</span>}
+          </button>
+        </div>
       </aside>
 
-      {/* Main content */}
-      <main className="flex-1 p-8 overflow-auto">
-        {children}
+      {/* Main Content */}
+      <main className="flex-1 overflow-auto bg-gray-50">
+        <div className="p-8">{children}</div>
       </main>
     </div>
-  );
+  )
 }

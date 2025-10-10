@@ -1,0 +1,9 @@
+export { default as UserForm } from "./forms/UserForm";
+export { default as UniversityForm } from "./UniversityForm";
+export { default as CollegeForm } from "./CollegeForm";
+export { default as FacultyForm } from "./FacultyForm";
+export { default as ProgramForm } from "./ProgramForm";
+export { default as CourseForm } from "./CourseForm";
+export { default as ExamForm } from "./ExamForm";
+export { default as QuestionForm } from "./QuestionForm";
+export { default as PaymentForm } from "./PaymentForm";
