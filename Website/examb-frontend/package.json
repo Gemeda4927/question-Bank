@@ -59,7 +59,7 @@
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.9",
-    "zod": "3.25.67",
+    "zod": "3.25.76",
     "axios": "1.12.2",
     "path": "0.12.7",
     "url": "0.11.4",

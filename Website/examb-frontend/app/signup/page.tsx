@@ -12,7 +12,7 @@ export default function SignupPage() {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [role, setRole] = useState<"student" | "instructor">("student")
+  const [role, setRole] = useState<"student" | "admin">("student")
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
   const [loading, setLoading] = useState(false)
@@ -35,7 +35,7 @@ export default function SignupPage() {
       setSuccess("Account created successfully! Redirecting...")
 
       setTimeout(() => {
-        if (role === "instructor") router.push("/dashboard/admin")
+        if (role === "admin") router.push("/dashboard/admin")
         else router.push("/dashboard/student")
       }, 1500)
     } catch (err: unknown) {
@@ -137,15 +137,15 @@ export default function SignupPage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setRole("instructor")}
+                    onClick={() => setRole("admin")}
                     className={`py-4 px-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2 ${
-                      role === "instructor"
+                      role === "admin"
                         ? "bg-gradient-to-r from-cyan-600 via-purple-500 to-purple-600 text-white shadow-xl scale-105"
                         : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105"
                     }`}
                   >
                     <Award className="w-5 h-5" />
-                    Instructor
+                    admin
                   </button>
                 </div>
               </div>
