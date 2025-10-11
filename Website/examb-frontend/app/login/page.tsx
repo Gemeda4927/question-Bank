@@ -1,39 +1,65 @@
-"use client"
-import { useState } from "react"
-import type React from "react"
+"use client";
+import { useState } from "react";
+import type React from "react";
 
-import api from "@/lib/api"
-import { useRouter } from "next/navigation"
-import { AxiosError } from "axios"
-import { BookOpen, Mail, Lock, ArrowRight, Loader2, Sparkles, Shield, Zap } from "lucide-react"
+import api from "@/lib/api";
+import { useRouter } from "next/navigation";
+import { AxiosError } from "axios";
+import {
+  BookOpen,
+  Mail,
+  Lock,
+  ArrowRight,
+  Loader2,
+  Sparkles,
+  Shield,
+  Zap,
+} from "lucide-react";
 
 export default function LoginPage() {
-  const router = useRouter()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
-  const [loading, setLoading] = useState(false)
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError("")
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
     try {
-      const { data } = await api.post("v1/users/login", { email, password })
-      localStorage.setItem("token", data.token)
+      const { data } = await api.post("v1/users/login", { email, password });
+      localStorage.setItem("token", data.token); // Store the token
 
-      const role = data.user.role
-      if (role === "instructor" || role === "admin") router.push("/dashboard/admin")
-      else router.push("/dashboard/student")
+      // Store the user data under "student" key
+      const userData = {
+        _id: data.user._id, // Assuming the API returns user._id
+        name: data.user.name || "Unknown", // Adjust based on API response
+        email: data.user.email || email, // Use provided email if name is missing
+        role: data.user.role,
+      };
+      localStorage.setItem("student", JSON.stringify(userData));
+      console.log("🟢 User data saved to localStorage:", userData);
+
+      const role = data.user.role;
+      if (role === "instructor" || role === "admin") {
+        router.push("/dashboard/admin");
+      } else {
+        router.push("/dashboard/student");
+      }
     } catch (err: unknown) {
-      if (err instanceof AxiosError) setError(err.response?.data?.message || "Login failed")
-      else if (err instanceof Error) setError(err.message)
-      else setError("Login failed")
+      if (err instanceof AxiosError) {
+        setError(err.response?.data?.message || "Login failed");
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Login failed");
+      }
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-cyan-50 flex items-center justify-center px-4 py-12 relative overflow-hidden">
@@ -85,7 +111,11 @@ export default function LoginPage() {
                   text: "Lightning-fast performance",
                   bg: "bg-cyan-100",
                 },
-                { icon: <Shield className="w-6 h-6 text-pink-600" />, text: "Secure and reliable", bg: "bg-pink-100" },
+                {
+                  icon: <Shield className="w-6 h-6 text-pink-600" />,
+                  text: "Secure and reliable",
+                  bg: "bg-pink-100",
+                },
               ].map((item, index) => (
                 <div
                   key={index}
@@ -193,5 +223,5 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
