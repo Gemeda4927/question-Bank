@@ -3,28 +3,47 @@ import AdminLayout from "@/components/AdminLayout"
 import ProtectedRoute from "@/components/ProtectedRoute"
 import DataTable from "@/components/DataTable"
 import { adminService } from "@/services/adminService"
-import PaymentForm from "@/components/forms/PaymentForm"
-import { CreditCard, DollarSign, CheckCircle2, Clock, XCircle } from "lucide-react"
+import { CreditCard, DollarSign, CheckCircle2, Clock, XCircle, Calendar, Hash } from "lucide-react"
 
 export default function PaymentsPage() {
   const paymentColumns = [
-    { key: "userId", label: "User ID" },
+    {
+      key: "userId",
+      label: "Student",
+      render: (value: any) => (
+        <div className="flex flex-col">
+          <span className="font-semibold text-sm">{value?.name || "N/A"}</span>
+          <span className="text-xs text-gray-500">{value?.email || ""}</span>
+        </div>
+      ),
+    },
+    {
+      key: "courseId",
+      label: "Course",
+      render: (value: any) => (
+        <div className="flex flex-col">
+          <span className="font-semibold text-sm">{value?.name || "N/A"}</span>
+          <span className="text-xs text-gray-500">{value?.code || ""}</span>
+        </div>
+      ),
+    },
     {
       key: "amount",
       label: "Amount",
       render: (value: number) => (
         <span className="inline-flex items-center gap-1.5 text-sm font-semibold">
-          <DollarSign className="w-4 h-4 text-emerald-500" />${value.toFixed(2)}
+          <DollarSign className="w-4 h-4 text-emerald-500" />
+          {value} ETB
         </span>
       ),
     },
     {
-      key: "paymentMethod",
-      label: "Method",
+      key: "transactionRef",
+      label: "Transaction Ref",
       render: (value: string) => (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/20 text-accent text-sm font-semibold">
-          <CreditCard className="w-3 h-3" />
-          {value}
+        <span className="inline-flex items-center gap-1.5 text-xs font-mono text-gray-600">
+          <Hash className="w-3 h-3" />
+          {value ? value.substring(0, 20) + "..." : "N/A"}
         </span>
       ),
     },
@@ -33,7 +52,7 @@ export default function PaymentsPage() {
       label: "Status",
       render: (value: string) => {
         const statusConfig = {
-          completed: {
+          success: {
             icon: CheckCircle2,
             className: "bg-emerald-500/20 text-emerald-500",
           },
@@ -63,8 +82,13 @@ export default function PaymentsPage() {
     },
     {
       key: "createdAt",
-      label: "Created At",
-      render: (value: string) => new Date(value).toLocaleDateString(),
+      label: "Date",
+      render: (value: string) => (
+        <span className="inline-flex items-center gap-1.5 text-sm text-gray-600">
+          <Calendar className="w-4 h-4" />
+          {new Date(value).toLocaleDateString()}
+        </span>
+      ),
     },
   ]
 
@@ -76,7 +100,7 @@ export default function PaymentsPage() {
             <CreditCard className="w-8 h-8 text-primary" />
             <h1 className="text-4xl font-bold text-foreground">Payments Management</h1>
           </div>
-          <p className="text-muted-foreground text-lg">Manage payment records</p>
+          <p className="text-muted-foreground text-lg">View and manage payment transactions via Chapa</p>
         </div>
 
         <DataTable
@@ -84,7 +108,7 @@ export default function PaymentsPage() {
           title="All Payments"
           columns={paymentColumns}
           service={adminService}
-          createForm={PaymentForm}
+          hideCreate={true}
         />
       </AdminLayout>
     </ProtectedRoute>
