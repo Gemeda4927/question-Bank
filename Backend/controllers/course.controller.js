@@ -16,6 +16,7 @@ exports.createCourse = async (req, res) => {
       prerequisites,
       instructors,
       exams,
+      subscribedStudents, // optional on creation
     } = req.body;
 
     if (!programId) {
@@ -34,14 +35,23 @@ exports.createCourse = async (req, res) => {
       prerequisites: prerequisites || [],
       instructors: instructors || [],
       exams: exams || [],
+      subscribedStudents: subscribedStudents || [],
     });
 
     await Program.findByIdAndUpdate(programId, { $push: { courses: course._id } });
 
+    // populate before sending response
+    const populatedCourse = await Course.findById(course._id)
+      .populate('programId', 'name code')
+      .populate('prerequisites', 'name code')
+      .populate('instructors', 'name email')
+      .populate('exams', 'name description')
+      .populate('subscribedStudents.studentId', 'name email');
+
     res.status(201).json({
       status: 'success',
       message: '🎉 Course created successfully!',
-      data: course,
+      data: populatedCourse,
     });
   } catch (error) {
     res.status(400).json({ status: 'fail', message: error.message });
@@ -55,7 +65,8 @@ exports.getAllCourses = async (req, res) => {
       .populate('programId', 'name code')
       .populate('prerequisites', 'name code')
       .populate('instructors', 'name email')
-      .populate('exams', 'name description');
+      .populate('exams', 'name description')
+      .populate('subscribedStudents.studentId', 'name email');
 
     res.status(200).json({
       status: 'success',
@@ -74,7 +85,8 @@ exports.getCourseById = async (req, res) => {
       .populate('programId', 'name code')
       .populate('prerequisites', 'name code')
       .populate('instructors', 'name email')
-      .populate('exams', 'name description');
+      .populate('exams', 'name description')
+      .populate('subscribedStudents.studentId', 'name email');
 
     if (!course || course.isDeleted) {
       return res.status(404).json({ status: 'fail', message: 'Course not found' });
@@ -96,7 +108,8 @@ exports.updateCourse = async (req, res) => {
       .populate('programId', 'name code')
       .populate('prerequisites', 'name code')
       .populate('instructors', 'name email')
-      .populate('exams', 'name description');
+      .populate('exams', 'name description')
+      .populate('subscribedStudents.studentId', 'name email');
 
     if (!course || course.isDeleted) {
       return res.status(404).json({ status: 'fail', message: 'Course not found' });
