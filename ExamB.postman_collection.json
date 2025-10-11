@@ -1,0 +1,2944 @@
+{
+	"info": {
+		"_postman_id": "f270c639-a337-49be-a5c2-5ed8a5369994",
+		"name": "ExamB",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "36153003"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "sighup",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\r\n  \"name\": \"Caalaa\",\r\n  \"email\": \"caalaa@gmail.com\",\r\n  \"password\": \"caal123\",\r\n  \"role\": \"admin\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/users/signup",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJzdHVkZW50IiwiaWF0IjoxNzYwMDE2MzEzLCJleHAiOjE3NjA2MjExMTN9.ogxak5wd-sokBLBAX4LWbxQHyfmia6nZ233ZbU_Rj5E",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"gemedatam@gmail.com\",\r\n  \"password\": \"Gammee4927\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/users/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "users",
+			"item": [
+				{
+					"name": "Create new users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZThjYzk4YzE2ODU4MDA5YTk0OGNkMSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc2MDExNzA5MywiZXhwIjoxNzYwNzIxODkzfQ.UfCblvu_qHNfTUFxbKyNhdZgcbKBU6HN81RcKGPz_O8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Gemeda Tamiru\",\r\n  \"email\": \"john@example.com\",\r\n  \"password\": \"password123\",\r\n  \"passwordConfirm\": \"password123\",\r\n  \"role\": \"user\"   // optional, default \"user\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all users",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTU3OTY0NywiZXhwIjoxNzYwMTg0NDQ3fQ.3to8ssCQrekO6D6RK8dUbUtvPqI8tNAVm4ResgJRJPw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Gemeda Tamiru\",\r\n  \"email\": \"john@example.com\",\r\n  \"password\": \"password123\",\r\n  \"passwordConfirm\": \"password123\",\r\n  \"role\": \"user\"   // optional, default \"user\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET user by ID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTU3OTY0NywiZXhwIjoxNzYwMTg0NDQ3fQ.3to8ssCQrekO6D6RK8dUbUtvPqI8tNAVm4ResgJRJPw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"gemedatam@example.com\",\r\n  \"password\": \"password123\"\r\n}\r\n"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/users/68e10a92d38ee746c1fdefa1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"68e10a92d38ee746c1fdefa1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTU3OTY0NywiZXhwIjoxNzYwMTg0NDQ3fQ.3to8ssCQrekO6D6RK8dUbUtvPqI8tNAVm4ResgJRJPw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Alice Updated\",\r\n  \"role\": \"student\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/users/68e10a92d38ee746c1fdefa1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"68e10a92d38ee746c1fdefa1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Hard Delete User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTU3OTY0NywiZXhwIjoxNzYwMTg0NDQ3fQ.3to8ssCQrekO6D6RK8dUbUtvPqI8tNAVm4ResgJRJPw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Alice Updated\",\r\n  \"role\": \"student\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/users/68e10a92d38ee746c1fdefa1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"68e10a92d38ee746c1fdefa1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Soft Delete User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTU3OTY0NywiZXhwIjoxNzYwMTg0NDQ3fQ.3to8ssCQrekO6D6RK8dUbUtvPqI8tNAVm4ResgJRJPw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"gemedatam@example.com\",\r\n  \"password\": \"password123\"\r\n}\r\n"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/users/68e10c88d4aeec703a75cb20/restore",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"68e10c88d4aeec703a75cb20",
+								"restore"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "restore user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTU3OTY0NywiZXhwIjoxNzYwMTg0NDQ3fQ.3to8ssCQrekO6D6RK8dUbUtvPqI8tNAVm4ResgJRJPw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/users/68e10c88d4aeec703a75cb20/restore",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"68e10c88d4aeec703a75cb20",
+								"restore"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "universities",
+			"item": [
+				{
+					"name": "create new universities",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTU3OTY0NywiZXhwIjoxNzYwMTg0NDQ3fQ.3to8ssCQrekO6D6RK8dUbUtvPqI8tNAVm4ResgJRJPw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Addis Ababa University\",\r\n  \"location\": \"Addis Ababa, Ethiopia\",\r\n  \"logo\": \"https://example.com/logos/aau.png\",\r\n  \"description\": \"The oldest and largest university in Ethiopia, offering a wide range of programs.\",\r\n  \"type\": \"Public\",\r\n  \"mode\": \"Sync\",\r\n  \"ratings\": {\r\n    \"average\": 4.5,\r\n    \"count\": 1200\r\n  },\r\n  \"isDeleted\": false,\r\n  \"deletedAt\": null\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/universities",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"universities"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Gell all universities",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTY2MjU5NSwiZXhwIjoxNzYwMjY3Mzk1fQ.stm2UErKasTWwE9Nft-FbyMKc1x65HnsslCxB04yihU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/universities",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"universities"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get universities by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTU3OTY0NywiZXhwIjoxNzYwMTg0NDQ3fQ.3to8ssCQrekO6D6RK8dUbUtvPqI8tNAVm4ResgJRJPw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/universities/68e63ecb97c1f763f7d2001a",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"universities",
+								"68e63ecb97c1f763f7d2001a"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update universities",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTU3OTY0NywiZXhwIjoxNzYwMTg0NDQ3fQ.3to8ssCQrekO6D6RK8dUbUtvPqI8tNAVm4ResgJRJPw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Addis Ababa University - Updated\",\r\n  \"location\": \"Addis Ababa, Ethiopia\",\r\n  \"logo\": \"https://example.com/logos/aau-updated.png\",\r\n  \"description\": \"Updated description: A leading university in Ethiopia, now with more programs.\",\r\n  \"type\": \"Private\",\r\n  \"mode\": \"Async\",\r\n  \"ratings\": {\r\n    \"average\": 4.8,\r\n    \"count\": 1250\r\n  },\r\n  \"isDeleted\": false\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/universities/68e63ecb97c1f763f7d2001a",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"universities",
+								"68e63ecb97c1f763f7d2001a"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Soft Delete University",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTU3OTY0NywiZXhwIjoxNzYwMTg0NDQ3fQ.3to8ssCQrekO6D6RK8dUbUtvPqI8tNAVm4ResgJRJPw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/universities/68e63ecb97c1f763f7d2001a/soft-delete",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"universities",
+								"68e63ecb97c1f763f7d2001a",
+								"soft-delete"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Restore Soft-Deleted University",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTU3OTY0NywiZXhwIjoxNzYwMTg0NDQ3fQ.3to8ssCQrekO6D6RK8dUbUtvPqI8tNAVm4ResgJRJPw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/universities/68e63ecb97c1f763f7d2001a/restore",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"universities",
+								"68e63ecb97c1f763f7d2001a",
+								"restore"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Hard Delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTU3OTY0NywiZXhwIjoxNzYwMTg0NDQ3fQ.3to8ssCQrekO6D6RK8dUbUtvPqI8tNAVm4ResgJRJPw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/universities/68e216e3654f18b154abca61",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"universities",
+								"68e216e3654f18b154abca61"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "programs",
+			"item": [
+				{
+					"name": "create new programs",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTU3OTY0NywiZXhwIjoxNzYwMTg0NDQ3fQ.3to8ssCQrekO6D6RK8dUbUtvPqI8tNAVm4ResgJRJPw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Bachelor of Computer Science\",\r\n  \"code\": \"BCS101\",\r\n  \"description\": \"Undergraduate program focusing on computer science fundamentals and software development.\",\r\n  \"faculty\": \"68e64a2966548f2b02065825\", \r\n  \"type\": \"Undergraduate\",\r\n  \"level\": \"1\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/programs",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"programs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all programs",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTU3OTY0NywiZXhwIjoxNzYwMTg0NDQ3fQ.3to8ssCQrekO6D6RK8dUbUtvPqI8tNAVm4ResgJRJPw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Architecture\",\r\n  \"description\": \"Bachelor of Architecture program focusing on design, urban planning, and sustainable building.\",\r\n  \"universityId\": \"68e22d8f51c25029ade86702\",\r\n  \"level\": \"Bachelor\",\r\n  \"duration\": \"5 years\",\r\n  \"eligibility\": \"High School Diploma\",\r\n  \"careerPaths\": [\"Architect\", \"Urban Planner\", \"Interior Designer\"],\r\n  \"isFeatured\": false\r\n}\r\n"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/programs",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"programs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Getpr pograms by id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTU3OTY0NywiZXhwIjoxNzYwMTg0NDQ3fQ.3to8ssCQrekO6D6RK8dUbUtvPqI8tNAVm4ResgJRJPw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Architecture\",\r\n  \"description\": \"Bachelor of Architecture program focusing on design, urban planning, and sustainable building.\",\r\n  \"universityId\": \"68e22d8f51c25029ade86702\",\r\n  \"level\": \"Bachelor\",\r\n  \"duration\": \"5 years\",\r\n  \"eligibility\": \"High School Diploma\",\r\n  \"careerPaths\": [\"Architect\", \"Urban Planner\", \"Interior Designer\"],\r\n  \"isFeatured\": false\r\n}\r\n"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/programs/68e64d814b148a35fe3d480e",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"programs",
+								"68e64d814b148a35fe3d480e"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update Program",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTU3OTY0NywiZXhwIjoxNzYwMTg0NDQ3fQ.3to8ssCQrekO6D6RK8dUbUtvPqI8tNAVm4ResgJRJPw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Computer Science\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/programs/68e64d814b148a35fe3d480e",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"programs",
+								"68e64d814b148a35fe3d480e"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "hardDelete Program",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTU3OTY0NywiZXhwIjoxNzYwMTg0NDQ3fQ.3to8ssCQrekO6D6RK8dUbUtvPqI8tNAVm4ResgJRJPw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Gammee\",\r\n  \"description\": \"Bachelor of Architecture program focusing on design, urban planning, and sustainable building.\",\r\n  \"universityId\": \"68e22d8f51c25029ade86702\",\r\n  \"level\": \"Bachelor\",\r\n  \"duration\": \"5 years\",\r\n  \"eligibility\": \"High School Diploma\",\r\n  \"careerPaths\": [\"Architect\", \"Urban Planner\", \"Interior Designer\"],\r\n  \"isFeatured\": false\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/programs/68e64d814b148a35fe3d480e",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"programs",
+								"68e64d814b148a35fe3d480e"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "softDelete Program",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTU3OTY0NywiZXhwIjoxNzYwMTg0NDQ3fQ.3to8ssCQrekO6D6RK8dUbUtvPqI8tNAVm4ResgJRJPw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Gammee\",\r\n  \"description\": \"Bachelor of Architecture program focusing on design, urban planning, and sustainable building.\",\r\n  \"universityId\": \"68e22d8f51c25029ade86702\",\r\n  \"level\": \"Bachelor\",\r\n  \"duration\": \"5 years\",\r\n  \"eligibility\": \"High School Diploma\",\r\n  \"careerPaths\": [\"Architect\", \"Urban Planner\", \"Interior Designer\"],\r\n  \"isFeatured\": false\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/programs/68e64dcd4b148a35fe3d4818/soft-delete",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"programs",
+								"68e64dcd4b148a35fe3d4818",
+								"soft-delete"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "restore Program",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTU3OTY0NywiZXhwIjoxNzYwMTg0NDQ3fQ.3to8ssCQrekO6D6RK8dUbUtvPqI8tNAVm4ResgJRJPw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Gammee\",\r\n  \"description\": \"Bachelor of Architecture program focusing on design, urban planning, and sustainable building.\",\r\n  \"universityId\": \"68e22d8f51c25029ade86702\",\r\n  \"level\": \"Bachelor\",\r\n  \"duration\": \"5 years\",\r\n  \"eligibility\": \"High School Diploma\",\r\n  \"careerPaths\": [\"Architect\", \"Urban Planner\", \"Interior Designer\"],\r\n  \"isFeatured\": false\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/programs/68e64dcd4b148a35fe3d4818/restore",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"programs",
+								"68e64dcd4b148a35fe3d4818",
+								"restore"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "departments",
+			"item": [
+				{
+					"name": "Create a new department",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTU3OTY0NywiZXhwIjoxNzYwMTg0NDQ3fQ.3to8ssCQrekO6D6RK8dUbUtvPqI8tNAVm4ResgJRJPw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Computer Science\",\r\n  \"code\": \"CS01\",\r\n  \"description\": \"Software & AI\",\r\n  \"universityId\": \"652f1b8b9c7e3a456789abcd\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/departments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"departments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all departments",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTU3OTY0NywiZXhwIjoxNzYwMTg0NDQ3fQ.3to8ssCQrekO6D6RK8dUbUtvPqI8tNAVm4ResgJRJPw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Computer Science Department\",\r\n  \"code\": \"CS101\",\r\n  \"description\": \"Focuses on computer science, software engineering, and AI research.\",\r\n  \"university\": \"68e4ac8ab64b6a49e36333ee\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/departments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"departments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get departments by id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTU3OTY0NywiZXhwIjoxNzYwMTg0NDQ3fQ.3to8ssCQrekO6D6RK8dUbUtvPqI8tNAVm4ResgJRJPw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Computer Science Department\",\r\n  \"code\": \"CS101\",\r\n  \"description\": \"Focuses on computer science, software engineering, and AI research.\",\r\n  \"university\": \"68e4ac8ab64b6a49e36333ee\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/departments/68e4bc4458bd12235817a23c",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"departments",
+								"68e4bc4458bd12235817a23c"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Department",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTU3OTY0NywiZXhwIjoxNzYwMTg0NDQ3fQ.3to8ssCQrekO6D6RK8dUbUtvPqI8tNAVm4ResgJRJPw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"description\": \"Updated description for Computer Science department\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/departments/68e4b0a1282ede7b49fdd06b",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"departments",
+								"68e4b0a1282ede7b49fdd06b"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Restore Department",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTU3OTY0NywiZXhwIjoxNzYwMTg0NDQ3fQ.3to8ssCQrekO6D6RK8dUbUtvPqI8tNAVm4ResgJRJPw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"description\": \"Updated description for Computer Science department\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/departments/68e4b0a1282ede7b49fdd06b/restore",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"departments",
+								"68e4b0a1282ede7b49fdd06b",
+								"restore"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Soft Delete Department",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTU3OTY0NywiZXhwIjoxNzYwMTg0NDQ3fQ.3to8ssCQrekO6D6RK8dUbUtvPqI8tNAVm4ResgJRJPw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"description\": \"Updated description for Computer Science department\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/departments/68e4b0a1282ede7b49fdd06b/restore",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"departments",
+								"68e4b0a1282ede7b49fdd06b",
+								"restore"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Department",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTU3OTY0NywiZXhwIjoxNzYwMTg0NDQ3fQ.3to8ssCQrekO6D6RK8dUbUtvPqI8tNAVm4ResgJRJPw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"description\": \"Updated description for Computer Science department\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/departments/68e4b0a1282ede7b49fdd06b",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"departments",
+								"68e4b0a1282ede7b49fdd06b"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "course",
+			"item": [
+				{
+					"name": "create new course",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Advanced JavaScript\",\r\n  \"code\": \"JS401\",\r\n  \"description\": \"Deep dive into modern JavaScript, Node.js, and async programming.\",\r\n  \"price\": 500,\r\n  \"programId\": \"68e64dcd4b148a35fe3d4818\",\r\n  \"creditHours\": 3,\r\n  \"semester\": 1,\r\n  \"level\": \"Bachelor\",\r\n\r\n  \"subscribedStudents\": [],\r\n  \"isDeleted\": false\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/courses",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"courses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all courses",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Data Structures\",\r\n  \"code\": \"CS201\",\r\n  \"description\": \"Covers arrays, linked lists, stacks, queues, trees, and graphs.\",\r\n  \"programId\": \"68e64dcd4b148a35fe3d4818\",\r\n  \"creditHours\": 3,\r\n  \"semester\": 2,\r\n  \"level\": \"Bachelor\",\r\n  \"prerequisites\": [\"652a1f9b7b1c4d3f88a1e9d0\"],\r\n  \"instructors\": [\"652a1f9b7b1c4d3f88a1e9e0\"],\r\n  \"exams\": [\"652a1f9b7b1c4d3f88a1e9f0\"]\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/courses",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"courses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a course by ID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Data Structures\",\r\n  \"code\": \"CS201\",\r\n  \"description\": \"Covers arrays, linked lists, stacks, queues, trees, and graphs.\",\r\n  \"programId\": \"68e64dcd4b148a35fe3d4818\",\r\n  \"creditHours\": 3,\r\n  \"semester\": 2,\r\n  \"level\": \"Bachelor\",\r\n  \"prerequisites\": [\"652a1f9b7b1c4d3f88a1e9d0\"],\r\n  \"instructors\": [\"652a1f9b7b1c4d3f88a1e9e0\"],\r\n  \"exams\": [\"652a1f9b7b1c4d3f88a1e9f0\"]\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/courses/68e65066893a7ec81c652899",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"courses",
+								"68e65066893a7ec81c652899"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update a course",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Advanced Data Structures\",\r\n  \"description\": \"Covers advanced topics like AVL trees, B-trees, heaps, and hash tables.\",\r\n  \"creditHours\": 4\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/courses/68e65066893a7ec81c652899",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"courses",
+								"68e65066893a7ec81c652899"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Soft-delete a course",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Advanced Data Structures\",\r\n  \"description\": \"Covers advanced topics like AVL trees, B-trees, heaps, and hash tables.\",\r\n  \"creditHours\": 4\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/courses/soft/68e65066893a7ec81c652899",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"courses",
+								"soft",
+								"68e65066893a7ec81c652899"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Restore a soft-deleted course",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Advanced Data Structures\",\r\n  \"description\": \"Covers advanced topics like AVL trees, B-trees, heaps, and hash tables.\",\r\n  \"creditHours\": 4\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/courses/restore/68e65066893a7ec81c652899",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"courses",
+								"restore",
+								"68e65066893a7ec81c652899"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Hard delete a course",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Advanced Data Structures\",\r\n  \"description\": \"Covers advanced topics like AVL trees, B-trees, heaps, and hash tables.\",\r\n  \"creditHours\": 4\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/courses/hard/68e65066893a7ec81c652899",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"courses",
+								"hard",
+								"68e65066893a7ec81c652899"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "college",
+			"item": [
+				{
+					"name": "create new  College",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTkyMDMwMSwiZXhwIjoxNzYwNTI1MTAxfQ.kZecPHAHJ4z0l1baKlkYnvko40mrDUyJ7WqjW-RWiYA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Engineering College\",\r\n  \"code\": \"ENG001\",\r\n  \"description\": \"College of Engineering\",\r\n  \"university\": \"68e63ecb97c1f763f7d2001a\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/colleges",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"colleges"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all colleges",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTkyMDMwMSwiZXhwIjoxNzYwNTI1MTAxfQ.kZecPHAHJ4z0l1baKlkYnvko40mrDUyJ7WqjW-RWiYA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Engineering College\",\r\n  \"code\": \"ENG001\",\r\n  \"description\": \"College of Engineering\",\r\n  \"university\": \"68e63ecb97c1f763f7d2001a\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/colleges",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"colleges"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get single college",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTkyMDMwMSwiZXhwIjoxNzYwNTI1MTAxfQ.kZecPHAHJ4z0l1baKlkYnvko40mrDUyJ7WqjW-RWiYA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Engineering College\",\r\n  \"code\": \"ENG001\",\r\n  \"description\": \"College of Engineering\",\r\n  \"university\": \"68e63ecb97c1f763f7d2001a\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/colleges/68e6416a3d26d742fbbca2fb",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"colleges",
+								"68e6416a3d26d742fbbca2fb"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update college",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTkyMDMwMSwiZXhwIjoxNzYwNTI1MTAxfQ.kZecPHAHJ4z0l1baKlkYnvko40mrDUyJ7WqjW-RWiYA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Updated Engineering College\",\r\n  \"code\": \"ENG002\",\r\n  \"description\": \"Updated description\",\r\n  \"university\": \"64f5b9f2d3c1a12ab0a12346\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/colleges/68e6416a3d26d742fbbca2fb",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"colleges",
+								"68e6416a3d26d742fbbca2fb"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Soft delete college",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTkyMDMwMSwiZXhwIjoxNzYwNTI1MTAxfQ.kZecPHAHJ4z0l1baKlkYnvko40mrDUyJ7WqjW-RWiYA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Updated Engineering College\",\r\n  \"code\": \"ENG002\",\r\n  \"description\": \"Updated description\",\r\n  \"university\": \"64f5b9f2d3c1a12ab0a12346\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/colleges/soft/68e6416a3d26d742fbbca2fb",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"colleges",
+								"soft",
+								"68e6416a3d26d742fbbca2fb"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Restore college",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTkyMDMwMSwiZXhwIjoxNzYwNTI1MTAxfQ.kZecPHAHJ4z0l1baKlkYnvko40mrDUyJ7WqjW-RWiYA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Updated Engineering College\",\r\n  \"code\": \"ENG002\",\r\n  \"description\": \"Updated description\",\r\n  \"university\": \"64f5b9f2d3c1a12ab0a12346\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/colleges/restore/68e6416a3d26d742fbbca2fb",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"colleges",
+								"restore",
+								"68e6416a3d26d742fbbca2fb"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Restore college Copy",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTkyMDMwMSwiZXhwIjoxNzYwNTI1MTAxfQ.kZecPHAHJ4z0l1baKlkYnvko40mrDUyJ7WqjW-RWiYA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Updated Engineering College\",\r\n  \"code\": \"ENG002\",\r\n  \"description\": \"Updated description\",\r\n  \"university\": \"64f5b9f2d3c1a12ab0a12346\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/colleges/restore/68e6416a3d26d742fbbca2fb",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"colleges",
+								"restore",
+								"68e6416a3d26d742fbbca2fb"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Hard delete college",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTkyMDMwMSwiZXhwIjoxNzYwNTI1MTAxfQ.kZecPHAHJ4z0l1baKlkYnvko40mrDUyJ7WqjW-RWiYA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Updated Engineering College\",\r\n  \"code\": \"ENG002\",\r\n  \"description\": \"Updated description\",\r\n  \"university\": \"64f5b9f2d3c1a12ab0a12346\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/colleges/hard/68e6416a3d26d742fbbca2fb",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"colleges",
+								"hard",
+								"68e6416a3d26d742fbbca2fb"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "faculty",
+			"item": [
+				{
+					"name": "Create new faculty",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTkyMDMwMSwiZXhwIjoxNzYwNTI1MTAxfQ.kZecPHAHJ4z0l1baKlkYnvko40mrDUyJ7WqjW-RWiYA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Faculty of Engineering\",\r\n  \"code\": \"ENG001\",\r\n  \"description\": \"Offers programs in civil, electrical, and mechanical engineering.\",\r\n  \"college\": \"68e6416a3d26d742fbbca2fb\",\r\n  \"type\": \"Undergraduate\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/faculties",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"faculties"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get faculty by id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTkyMDMwMSwiZXhwIjoxNzYwNTI1MTAxfQ.kZecPHAHJ4z0l1baKlkYnvko40mrDUyJ7WqjW-RWiYA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Faculty of Engineering\",\r\n  \"code\": \"ENG001\",\r\n  \"description\": \"Offers programs in civil, electrical, and mechanical engineering.\",\r\n  \"college\": \"68e6416a3d26d742fbbca2fb\",\r\n  \"type\": \"Undergraduate\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/faculties/68e64a2966548f2b02065825",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"faculties",
+								"68e64a2966548f2b02065825"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Faculty",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTkyMDMwMSwiZXhwIjoxNzYwNTI1MTAxfQ.kZecPHAHJ4z0l1baKlkYnvko40mrDUyJ7WqjW-RWiYA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Faculty of Natural Sciences\",\r\n  \"dean\": \"Dr. Samuel Tadesse\",\r\n  \"description\": \"Covers physics, chemistry, biology, and environmental science programs.\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/faculties/68e64a2966548f2b02065825",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"faculties",
+								"68e64a2966548f2b02065825"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all faculty",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTkyMDMwMSwiZXhwIjoxNzYwNTI1MTAxfQ.kZecPHAHJ4z0l1baKlkYnvko40mrDUyJ7WqjW-RWiYA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Faculty of Engineering\",\r\n  \"code\": \"ENG001\",\r\n  \"description\": \"Offers programs in civil, electrical, and mechanical engineering.\",\r\n  \"college\": \"68e6416a3d26d742fbbca2fb\",\r\n  \"type\": \"Undergraduate\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/faculties",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"faculties"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Soft Delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTkyMDMwMSwiZXhwIjoxNzYwNTI1MTAxfQ.kZecPHAHJ4z0l1baKlkYnvko40mrDUyJ7WqjW-RWiYA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Faculty of Engineering\",\r\n  \"code\": \"ENG001\",\r\n  \"description\": \"Offers programs in civil, electrical, and mechanical engineering.\",\r\n  \"college\": \"68e6416a3d26d742fbbca2fb\",\r\n  \"type\": \"Undergraduate\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/faculties/68e64a2966548f2b02065825/soft-delete",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"faculties",
+								"68e64a2966548f2b02065825",
+								"soft-delete"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Restore Faculty",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTkyMDMwMSwiZXhwIjoxNzYwNTI1MTAxfQ.kZecPHAHJ4z0l1baKlkYnvko40mrDUyJ7WqjW-RWiYA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Faculty of Engineering\",\r\n  \"code\": \"ENG001\",\r\n  \"description\": \"Offers programs in civil, electrical, and mechanical engineering.\",\r\n  \"college\": \"68e6416a3d26d742fbbca2fb\",\r\n  \"type\": \"Undergraduate\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/faculties/68e64a2966548f2b02065825/restore",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"faculties",
+								"68e64a2966548f2b02065825",
+								"restore"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "hard delete faculty",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTkyMDMwMSwiZXhwIjoxNzYwNTI1MTAxfQ.kZecPHAHJ4z0l1baKlkYnvko40mrDUyJ7WqjW-RWiYA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Faculty of Engineering\",\r\n  \"code\": \"ENG001\",\r\n  \"description\": \"Offers programs in civil, electrical, and mechanical engineering.\",\r\n  \"college\": \"68e6416a3d26d742fbbca2fb\",\r\n  \"type\": \"Undergraduate\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/faculties/68e64a2966548f2b02065825",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"faculties",
+								"68e64a2966548f2b02065825"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Payment",
+			"item": [
+				{
+					"name": "Initialize Course Payment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJzdHVkZW50IiwiaWF0IjoxNzU5OTQ0NDA1LCJleHAiOjE3NjA1NDkyMDV9.ruA7u-eOsgEdvtWsunBJ-qiodo_BrgUN7cBbTkoYi6c",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"courseId\": \"68e69cd38c0c6f89f7baac4d\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/payments/course",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"payments",
+								"course"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Chapa webhook",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJzdHVkZW50IiwiaWF0IjoxNzU5OTI2ODgwLCJleHAiOjE3NjA1MzE2ODB9.pyuAkFKxquwFra87zSQTO4jZPduMXHYISQQfZRm_s00",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"courseId\": \"68e65185893a7ec81c6528af\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/payments/webhook",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"payments",
+								"webhook"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Exam",
+			"item": [
+				{
+					"name": "create new exams",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc2MDAxNjM4OSwiZXhwIjoxNzYwNjIxMTg5fQ.8WxAN0v0a5wfp7C7xuTf32RLm-2AFniE3MCTFvTBGeA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Advanced JavaScript\",\r\n  \"code\": \"JS401\",\r\n  \"courseId\": \"68e69cd38c0c6f89f7baac4d\",\r\n  \"description\": \"Final exam for advanced JS course\",\r\n  \"date\": \"2025-10-15T10:00:00.000Z\",\r\n  \"duration\": 120,\r\n  \"totalMarks\": 100,\r\n  \"passingMarks\": 50,\r\n  \"examType\": \"Online\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/exams",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"exams"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all exams",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc2MDAxNjM4OSwiZXhwIjoxNzYwNjIxMTg5fQ.8WxAN0v0a5wfp7C7xuTf32RLm-2AFniE3MCTFvTBGeA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Advanced JavaScript\",\r\n  \"code\": \"JS401\",\r\n  \"courseId\": \"68e69cd38c0c6f89f7baac4d\",\r\n  \"description\": \"Final exam for advanced JS course\",\r\n  \"date\": \"2025-10-15T10:00:00.000Z\",\r\n  \"duration\": 120,\r\n  \"totalMarks\": 100,\r\n  \"passingMarks\": 50,\r\n  \"examType\": \"Online\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/exams",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"exams"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Exam By ID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc2MDAxNjM4OSwiZXhwIjoxNzYwNjIxMTg5fQ.8WxAN0v0a5wfp7C7xuTf32RLm-2AFniE3MCTFvTBGeA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Advanced JavaScript\",\r\n  \"code\": \"JS401\",\r\n  \"courseId\": \"68e69cd38c0c6f89f7baac4d\",\r\n  \"description\": \"Final exam for advanced JS course\",\r\n  \"date\": \"2025-10-15T10:00:00.000Z\",\r\n  \"duration\": 120,\r\n  \"totalMarks\": 100,\r\n  \"passingMarks\": 50,\r\n  \"examType\": \"Online\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/exams/68e7b81616606befdf9e38d1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"exams",
+								"68e7b81616606befdf9e38d1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update exam",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc2MDAxNjM4OSwiZXhwIjoxNzYwNjIxMTg5fQ.8WxAN0v0a5wfp7C7xuTf32RLm-2AFniE3MCTFvTBGeA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Advanced JavaScript - Updated\",\r\n  \"duration\": 150,\r\n  \"totalMarks\": 120\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/exams/68e7b81616606befdf9e38d1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"exams",
+								"68e7b81616606befdf9e38d1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "soft delete exam",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc2MDAxNjM4OSwiZXhwIjoxNzYwNjIxMTg5fQ.8WxAN0v0a5wfp7C7xuTf32RLm-2AFniE3MCTFvTBGeA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Advanced JavaScript - Updated\",\r\n  \"duration\": 150,\r\n  \"totalMarks\": 120\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/exams/68e7b81616606befdf9e38d1/soft-delete",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"exams",
+								"68e7b81616606befdf9e38d1",
+								"soft-delete"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "restore exam",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc2MDAxNjM4OSwiZXhwIjoxNzYwNjIxMTg5fQ.8WxAN0v0a5wfp7C7xuTf32RLm-2AFniE3MCTFvTBGeA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Advanced JavaScript - Updated\",\r\n  \"duration\": 150,\r\n  \"totalMarks\": 120\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/exams/68e7b81616606befdf9e38d1/restore",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"exams",
+								"68e7b81616606befdf9e38d1",
+								"restore"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "hard delete exam",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc2MDAxNjM4OSwiZXhwIjoxNzYwNjIxMTg5fQ.8WxAN0v0a5wfp7C7xuTf32RLm-2AFniE3MCTFvTBGeA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Advanced JavaScript - Updated\",\r\n  \"duration\": 150,\r\n  \"totalMarks\": 120\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/exams/68e7b81616606befdf9e38d1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"exams",
+								"68e7b81616606befdf9e38d1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "question",
+			"item": [
+				{
+					"name": "Create new question",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc2MDAxNjM4OSwiZXhwIjoxNzYwNjIxMTg5fQ.8WxAN0v0a5wfp7C7xuTf32RLm-2AFniE3MCTFvTBGeA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "examId",
+									"value": "68e7bb7ed36599ff11e94cd5",
+									"type": "text"
+								},
+								{
+									"key": "text",
+									"value": "What is Node.js?",
+									"type": "text"
+								},
+								{
+									"key": "type",
+									"value": "multiple-choice",
+									"type": "text"
+								},
+								{
+									"key": "options[0]",
+									"value": "A runtime environment",
+									"type": "text"
+								},
+								{
+									"key": "options[1]",
+									"value": "A database",
+									"type": "text"
+								},
+								{
+									"key": "options[2]",
+									"value": "A programming language",
+									"type": "text"
+								},
+								{
+									"key": "correctAnswer",
+									"value": "A runtime environment",
+									"type": "text"
+								},
+								{
+									"key": "marks",
+									"value": "5",
+									"type": "text"
+								},
+								{
+									"key": "category",
+									"value": "Backend",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/HP/OneDrive/Desktop/photo_2025-10-05_15-41-19.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/questions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"questions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all questions",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc2MDAxNjM4OSwiZXhwIjoxNzYwNjIxMTg5fQ.8WxAN0v0a5wfp7C7xuTf32RLm-2AFniE3MCTFvTBGeA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "examId",
+									"value": "68e7bb7ed36599ff11e94cd5",
+									"type": "text"
+								},
+								{
+									"key": "text",
+									"value": "What is Node.js?",
+									"type": "text"
+								},
+								{
+									"key": "type",
+									"value": "multiple-choice",
+									"type": "text"
+								},
+								{
+									"key": "options[0]",
+									"value": "A runtime environment",
+									"type": "text"
+								},
+								{
+									"key": "options[1]",
+									"value": "A database",
+									"type": "text"
+								},
+								{
+									"key": "options[2]",
+									"value": "A programming language",
+									"type": "text"
+								},
+								{
+									"key": "correctAnswer",
+									"value": "A runtime environment",
+									"type": "text"
+								},
+								{
+									"key": "marks",
+									"value": "5",
+									"type": "text"
+								},
+								{
+									"key": "category",
+									"value": "Backend",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/HP/OneDrive/Desktop/photo_2025-10-05_15-41-19.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/questions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"questions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Question by ID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc2MDAxNjM4OSwiZXhwIjoxNzYwNjIxMTg5fQ.8WxAN0v0a5wfp7C7xuTf32RLm-2AFniE3MCTFvTBGeA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "examId",
+									"value": "68e7bb7ed36599ff11e94cd5",
+									"type": "text"
+								},
+								{
+									"key": "text",
+									"value": "What is Node.js?",
+									"type": "text"
+								},
+								{
+									"key": "type",
+									"value": "multiple-choice",
+									"type": "text"
+								},
+								{
+									"key": "options[0]",
+									"value": "A runtime environment",
+									"type": "text"
+								},
+								{
+									"key": "options[1]",
+									"value": "A database",
+									"type": "text"
+								},
+								{
+									"key": "options[2]",
+									"value": "A programming language",
+									"type": "text"
+								},
+								{
+									"key": "correctAnswer",
+									"value": "A runtime environment",
+									"type": "text"
+								},
+								{
+									"key": "marks",
+									"value": "5",
+									"type": "text"
+								},
+								{
+									"key": "category",
+									"value": "Backend",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/HP/OneDrive/Desktop/photo_2025-10-05_15-41-19.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/questions/68e7bf30739837c023970b61",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"questions",
+								"68e7bf30739837c023970b61"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Question",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc2MDAxNjM4OSwiZXhwIjoxNzYwNjIxMTg5fQ.8WxAN0v0a5wfp7C7xuTf32RLm-2AFniE3MCTFvTBGeA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "examId",
+									"value": "68e7bb7ed36599ff11e94cd5",
+									"type": "text"
+								},
+								{
+									"key": "text",
+									"value": "What is Node.js?",
+									"type": "text"
+								},
+								{
+									"key": "type",
+									"value": "multiple-choice",
+									"type": "text"
+								},
+								{
+									"key": "options[0]",
+									"value": "A runtime environment",
+									"type": "text"
+								},
+								{
+									"key": "options[1]",
+									"value": "A database",
+									"type": "text"
+								},
+								{
+									"key": "options[2]",
+									"value": "A programming language",
+									"type": "text"
+								},
+								{
+									"key": "correctAnswer",
+									"value": "A runtime environment",
+									"type": "text"
+								},
+								{
+									"key": "marks",
+									"value": "5",
+									"type": "text"
+								},
+								{
+									"key": "category",
+									"value": "Backend",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/HP/OneDrive/Desktop/photo_2025-10-05_15-41-19.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/questions/68e7bf30739837c023970b61",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"questions",
+								"68e7bf30739837c023970b61"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "soft delete question",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc2MDAxNjM4OSwiZXhwIjoxNzYwNjIxMTg5fQ.8WxAN0v0a5wfp7C7xuTf32RLm-2AFniE3MCTFvTBGeA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "examId",
+									"value": "68e7bb7ed36599ff11e94cd5",
+									"type": "text"
+								},
+								{
+									"key": "text",
+									"value": "What is Node.js?",
+									"type": "text"
+								},
+								{
+									"key": "type",
+									"value": "multiple-choice",
+									"type": "text"
+								},
+								{
+									"key": "options[0]",
+									"value": "A runtime environment",
+									"type": "text"
+								},
+								{
+									"key": "options[1]",
+									"value": "A database",
+									"type": "text"
+								},
+								{
+									"key": "options[2]",
+									"value": "A programming language",
+									"type": "text"
+								},
+								{
+									"key": "correctAnswer",
+									"value": "A runtime environment",
+									"type": "text"
+								},
+								{
+									"key": "marks",
+									"value": "5",
+									"type": "text"
+								},
+								{
+									"key": "category",
+									"value": "Backend",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/HP/OneDrive/Desktop/photo_2025-10-05_15-41-19.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/questions/68e7bf30739837c023970b61/soft-delete",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"questions",
+								"68e7bf30739837c023970b61",
+								"soft-delete"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "restore question",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc2MDAxNjM4OSwiZXhwIjoxNzYwNjIxMTg5fQ.8WxAN0v0a5wfp7C7xuTf32RLm-2AFniE3MCTFvTBGeA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "examId",
+									"value": "68e7bb7ed36599ff11e94cd5",
+									"type": "text"
+								},
+								{
+									"key": "text",
+									"value": "What is Node.js?",
+									"type": "text"
+								},
+								{
+									"key": "type",
+									"value": "multiple-choice",
+									"type": "text"
+								},
+								{
+									"key": "options[0]",
+									"value": "A runtime environment",
+									"type": "text"
+								},
+								{
+									"key": "options[1]",
+									"value": "A database",
+									"type": "text"
+								},
+								{
+									"key": "options[2]",
+									"value": "A programming language",
+									"type": "text"
+								},
+								{
+									"key": "correctAnswer",
+									"value": "A runtime environment",
+									"type": "text"
+								},
+								{
+									"key": "marks",
+									"value": "5",
+									"type": "text"
+								},
+								{
+									"key": "category",
+									"value": "Backend",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/HP/OneDrive/Desktop/photo_2025-10-05_15-41-19.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/questions/68e7bf30739837c023970b61/restore",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"questions",
+								"68e7bf30739837c023970b61",
+								"restore"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "hard delete question",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTEwYzg4ZDRhZWVjNzAzYTc1Y2IyMCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc2MDAxNjM4OSwiZXhwIjoxNzYwNjIxMTg5fQ.8WxAN0v0a5wfp7C7xuTf32RLm-2AFniE3MCTFvTBGeA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "examId",
+									"value": "68e7bb7ed36599ff11e94cd5",
+									"type": "text"
+								},
+								{
+									"key": "text",
+									"value": "What is Node.js?",
+									"type": "text"
+								},
+								{
+									"key": "type",
+									"value": "multiple-choice",
+									"type": "text"
+								},
+								{
+									"key": "options[0]",
+									"value": "A runtime environment",
+									"type": "text"
+								},
+								{
+									"key": "options[1]",
+									"value": "A database",
+									"type": "text"
+								},
+								{
+									"key": "options[2]",
+									"value": "A programming language",
+									"type": "text"
+								},
+								{
+									"key": "correctAnswer",
+									"value": "A runtime environment",
+									"type": "text"
+								},
+								{
+									"key": "marks",
+									"value": "5",
+									"type": "text"
+								},
+								{
+									"key": "category",
+									"value": "Backend",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/HP/OneDrive/Desktop/photo_2025-10-05_15-41-19.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/questions/68e7bf30739837c023970b61",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"questions",
+								"68e7bf30739837c023970b61"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

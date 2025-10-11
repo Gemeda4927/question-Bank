@@ -20,7 +20,7 @@ export default function LoginPage() {
     setError("")
 
     try {
-      const { data } = await api.post("/users/login", { email, password })
+      const { data } = await api.post("v1/users/login", { email, password })
       localStorage.setItem("token", data.token)
 
       const role = data.user.role
