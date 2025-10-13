@@ -1,15 +1,15 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose")
 
 const courseSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, 'Course name is required'],
+      required: [true, "Course name is required"],
       trim: true,
     },
     code: {
       type: String,
-      required: [true, 'Course code is required'],
+      required: [true, "Course code is required"],
       unique: true,
       uppercase: true,
       trim: true,
@@ -20,13 +20,13 @@ const courseSchema = new mongoose.Schema(
     },
     price: {
       type: Number,
-      required: [true, 'Course price is required'],
-      min: [1, 'Course price must be greater than 0'],
+      required: [true, "Course price is required"],
+      min: [1, "Course price must be greater than 0"],
     },
     programId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Program',
-      required: [true, 'Course must belong to a program'],
+      ref: "Program",
+      required: [true, "Course must belong to a program"],
     },
     creditHours: {
       type: Number,
@@ -41,33 +41,27 @@ const courseSchema = new mongoose.Schema(
     },
     level: {
       type: String,
-      enum: ['Bachelor', 'Master', 'PhD', 'Diploma'],
-      default: 'Bachelor',
+      enum: ["Bachelor", "Master", "PhD", "Diploma"],
+      default: "Bachelor",
     },
-    prerequisites: [
-      { type: mongoose.Schema.Types.ObjectId, ref: 'Course' }
-    ],
-    instructors: [
-      { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
-    ],
-    exams: [
-      { type: mongoose.Schema.Types.ObjectId, ref: 'Exam' }
-    ],
+    prerequisites: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
+    instructors: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    exams: [{ type: mongoose.Schema.Types.ObjectId, ref: "Exam" }],
     subscribedStudents: [
       {
-        studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        studentId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
         coursePaymentStatus: {
           type: String,
-          enum: ['unpaid', 'paid', 'pending', 'failed'],
-          default: 'unpaid',
+          enum: ["unpaid", "paid", "pending", "failed"],
+          default: "unpaid",
         },
         examsPaid: [
           {
-            examId: { type: mongoose.Schema.Types.ObjectId, ref: 'Exam' },
+            examId: { type: mongoose.Schema.Types.ObjectId, ref: "Exam" },
             paymentStatus: {
               type: String,
-              enum: ['unpaid', 'paid', 'pending', 'failed'],
-              default: 'unpaid',
+              enum: ["unpaid", "paid", "pending", "failed"],
+              default: "unpaid",
             },
             paidAt: { type: Date, default: Date.now },
           },
@@ -79,77 +73,125 @@ const courseSchema = new mongoose.Schema(
       default: false,
     },
   },
-  { timestamps: true }
-);
+  { timestamps: true },
+)
 
 // ====================== METHODS ======================
 
-// Add or update student subscription
-courseSchema.methods.addStudent = async function (userId, paymentStatus = 'paid') {
-  const User = mongoose.model('User');
+courseSchema.methods.addStudent = async function (userId, paymentStatus = "paid") {
+  const User = mongoose.model("User")
 
-  let student = this.subscribedStudents.find(s => s.studentId.toString() === userId.toString());
-  if (!student) {
-    this.subscribedStudents.push({ studentId: userId, coursePaymentStatus: paymentStatus });
+  const studentIndex = this.subscribedStudents.findIndex((s) => s.studentId.toString() === userId.toString())
+
+  if (studentIndex === -1) {
+    this.subscribedStudents.push({
+      studentId: userId,
+      coursePaymentStatus: paymentStatus,
+      examsPaid: [],
+    })
   } else {
-    student.coursePaymentStatus = paymentStatus;
+    this.subscribedStudents[studentIndex].coursePaymentStatus = paymentStatus
   }
-  await this.save();
 
-  const user = await User.findById(userId);
-  let subCourse = user.subscribedCourses.find(c => c.courseId.toString() === this._id.toString());
-  if (!subCourse) {
-    user.subscribedCourses.push({ courseId: this._id, paymentStatus });
+  await this.save()
+
+  const user = await User.findById(userId)
+  if (!user) throw new Error("User not found")
+
+  const subCourseIndex = user.subscribedCourses.findIndex((c) => c.courseId.toString() === this._id.toString())
+
+  if (subCourseIndex === -1) {
+    user.subscribedCourses.push({
+      courseId: this._id,
+      paymentStatus,
+      subscribedAt: new Date(),
+      examsPaid: [],
+    })
   } else {
-    subCourse.paymentStatus = paymentStatus;
+    user.subscribedCourses[subCourseIndex].paymentStatus = paymentStatus
   }
-  await user.save();
 
-  return true;
-};
+  await user.save()
 
-// Add or update exam payment for student
-courseSchema.methods.addExamPayment = async function (userId, examId, paymentStatus = 'paid') {
-  const User = mongoose.model('User');
-  const user = await User.findById(userId);
+  return true
+}
+
+courseSchema.methods.addExamPayment = async function (userId, examId, paymentStatus = "paid") {
+  const User = mongoose.model("User")
+  const user = await User.findById(userId)
+  if (!user) throw new Error("User not found")
 
   // Update Course
-  let student = this.subscribedStudents.find(s => s.studentId.toString() === userId.toString());
-  if (!student) {
-    student = { studentId: userId, coursePaymentStatus: 'unpaid', examsPaid: [] };
-    this.subscribedStudents.push(student);
+  const studentIndex = this.subscribedStudents.findIndex((s) => s.studentId.toString() === userId.toString())
+
+  if (studentIndex === -1) {
+    this.subscribedStudents.push({
+      studentId: userId,
+      coursePaymentStatus: "unpaid",
+      examsPaid: [{ examId, paymentStatus, paidAt: new Date() }],
+    })
+  } else {
+    const examIndex = this.subscribedStudents[studentIndex].examsPaid.findIndex(
+      (e) => e.examId.toString() === examId.toString(),
+    )
+
+    if (examIndex === -1) {
+      this.subscribedStudents[studentIndex].examsPaid.push({
+        examId,
+        paymentStatus,
+        paidAt: new Date(),
+      })
+    } else {
+      this.subscribedStudents[studentIndex].examsPaid[examIndex].paymentStatus = paymentStatus
+      this.subscribedStudents[studentIndex].examsPaid[examIndex].paidAt = new Date()
+    }
   }
-  if (!student.examsPaid.some(e => e.examId.toString() === examId.toString())) {
-    student.examsPaid.push({ examId, paymentStatus });
-  }
-  await this.save();
+
+  await this.save()
 
   // Update User
-  let subCourse = user.subscribedCourses.find(c => c.courseId.toString() === this._id.toString());
-  if (!subCourse) {
-    subCourse = { courseId: this._id, paymentStatus: 'unpaid', examsPaid: [] };
-    user.subscribedCourses.push(subCourse);
-  }
-  if (!subCourse.examsPaid.some(e => e.examId.toString() === examId.toString())) {
-    subCourse.examsPaid.push({ examId, paymentStatus });
-  }
-  await user.save();
+  const subCourseIndex = user.subscribedCourses.findIndex((c) => c.courseId.toString() === this._id.toString())
 
-  return true;
-};
+  if (subCourseIndex === -1) {
+    user.subscribedCourses.push({
+      courseId: this._id,
+      paymentStatus: "unpaid",
+      examsPaid: [{ examId, paymentStatus, paidAt: new Date() }],
+    })
+  } else {
+    const examIndex = user.subscribedCourses[subCourseIndex].examsPaid.findIndex(
+      (e) => e.examId.toString() === examId.toString(),
+    )
+
+    if (examIndex === -1) {
+      user.subscribedCourses[subCourseIndex].examsPaid.push({
+        examId,
+        paymentStatus,
+        paidAt: new Date(),
+      })
+    } else {
+      user.subscribedCourses[subCourseIndex].examsPaid[examIndex].paymentStatus = paymentStatus
+      user.subscribedCourses[subCourseIndex].examsPaid[examIndex].paidAt = new Date()
+    }
+  }
+
+  await user.save()
+
+  return true
+}
 
 // Check if student can access course or exam
 courseSchema.methods.canAccess = function (userId, examId = null) {
-  const student = this.subscribedStudents.find(s => s.studentId.toString() === userId.toString());
-  if (!student) return false;
+  const student = this.subscribedStudents.find((s) => s.studentId.toString() === userId.toString())
+  if (!student) return false
 
-  if (student.coursePaymentStatus === 'paid') return true;
+  if (student.coursePaymentStatus === "paid") return true
 
   if (examId) {
-    return student.examsPaid.some(e => e.examId.toString() === examId.toString() && e.paymentStatus === 'paid');
+    return student.examsPaid.some((e) => e.examId.toString() === examId.toString() && e.paymentStatus === "paid")
   }
 
-  return false;
-};
+  return false
+}
 
-module.exports = mongoose.model('Course', courseSchema);
+module.exports = mongoose.model("Course", courseSchema)

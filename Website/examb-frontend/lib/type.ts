@@ -1,4 +1,3 @@
-
 interface Program {
   _id: string
   name: string
@@ -63,4 +62,35 @@ interface EnrollmentStatus {
 interface SubscriptionModalData {
   course: Course | null
   showModal: boolean
+}
+
+interface Question {
+  _id: string
+  text: string
+  type: "multiple-choice" | "true-false" | "short-answer" | "essay"
+  options?: string[]
+  marks: number
+  correctAnswer?: string
+}
+
+interface ExamDetail {
+  _id: string
+  name: string
+  code: string
+  courseId: {
+    _id: string
+    name: string
+    code: string
+  }
+  type: "quiz" | "midterm" | "final"
+  description?: string
+  date: string
+  duration: number
+  totalMarks: number
+  passingMarks: number
+  questions: Question[]
+  subscribedStudents: any[]
+  isDeleted: boolean
+  createdAt: string
+  updatedAt: string
 }

@@ -17,36 +17,31 @@ const questionSchema = new mongoose.Schema(
       enum: ['multiple-choice', 'true-false', 'short-answer'],
       default: 'multiple-choice',
     },
-    options: [
-      {
-        type: String,
-      },
-    ],
+    options: [String],
     correctAnswer: {
       type: String,
-      required: function () {
-        return this.type !== 'short-answer';
-      },
+      trim: true,
+      default: '',
     },
     marks: {
       type: Number,
       default: 1,
-      min: 0,
     },
     category: {
       type: String,
       trim: true,
+      default: '',
     },
     imageUrl: {
-      type: String, 
+      type: String,
       trim: true,
-    },
-    isDeleted: {
-      type: Boolean,
-      default: false,
+      default: '',
     },
   },
   { timestamps: true }
 );
+
+// UNIQUE INDEX: prevent duplicate questions for same exam
+questionSchema.index({ examId: 1, text: 1 }, { unique: true });
 
 module.exports = mongoose.model('Question', questionSchema);

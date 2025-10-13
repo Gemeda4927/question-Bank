@@ -1,28 +1,28 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose")
 
 const examSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, 'Exam name is required'],
+      required: [true, "Exam name is required"],
       trim: true,
     },
     code: {
       type: String,
-      required: [true, 'Exam code is required'],
+      required: [true, "Exam code is required"],
       unique: true,
       uppercase: true,
       trim: true,
     },
     courseId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Course',
-      required: [true, 'Exam must belong to a course'],
+      ref: "Course",
+      required: [true, "Exam must belong to a course"],
     },
     type: {
       type: String,
-      enum: ['midterm', 'final', 'quiz', 'assignment'],
-      default: 'final',
+      enum: ["midterm", "final", "quiz", "assignment"],
+      default: "final",
       trim: true,
     },
     description: {
@@ -31,11 +31,11 @@ const examSchema = new mongoose.Schema(
     },
     date: {
       type: Date,
-      required: [true, 'Exam date is required'],
+      required: [true, "Exam date is required"],
     },
     duration: {
       type: Number, // in minutes
-      required: [true, 'Exam duration is required'],
+      required: [true, "Exam duration is required"],
     },
     totalMarks: {
       type: Number,
@@ -50,16 +50,16 @@ const examSchema = new mongoose.Schema(
     questions: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Question',
+        ref: "Question",
       },
     ],
     subscribedStudents: [
       {
-        studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        studentId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
         paymentStatus: {
           type: String,
-          enum: ['unpaid', 'paid', 'pending', 'failed'],
-          default: 'unpaid',
+          enum: ["unpaid", "paid", "pending", "failed"],
+          default: "unpaid",
         },
         subscribedAt: { type: Date, default: Date.now },
       },
@@ -69,55 +69,72 @@ const examSchema = new mongoose.Schema(
       default: false,
     },
   },
-  { timestamps: true }
-);
+  { timestamps: true },
+)
 
 // ====================== ADD STUDENT TO EXAM ======================
-examSchema.methods.addStudent = async function (studentId, paymentStatus = 'paid') {
-  const User = mongoose.model('User');
+examSchema.methods.addStudent = async function (studentId, paymentStatus = "paid") {
+  const User = mongoose.model("User")
 
-  // Avoid duplicate subscription
-  const alreadySubscribed = this.subscribedStudents.some(
-    (s) => s.studentId.toString() === studentId.toString()
-  );
+  const existingIndex = this.subscribedStudents.findIndex((s) => s.studentId.toString() === studentId.toString())
 
-  if (!alreadySubscribed) {
-    this.subscribedStudents.push({ studentId, paymentStatus });
-    await this.save();
+  if (existingIndex === -1) {
+    this.subscribedStudents.push({ studentId, paymentStatus, subscribedAt: new Date() })
+  } else {
+    this.subscribedStudents[existingIndex].paymentStatus = paymentStatus
   }
 
-  // Update student's course subscription for exam reference
-  const student = await User.findById(studentId);
-  if (student) {
-    const courseSubscription = student.subscribedCourses.find(
-      (c) => c.courseId.toString() === this.courseId.toString()
-    );
+  await this.save()
 
-    if (courseSubscription) {
-      courseSubscription.exams = courseSubscription.exams || [];
-      if (!courseSubscription.exams.includes(this._id)) {
-        courseSubscription.exams.push(this._id);
+  const student = await User.findById(studentId)
+  if (student) {
+    const courseSubIndex = student.subscribedCourses.findIndex(
+      (c) => c.courseId.toString() === this.courseId.toString(),
+    )
+
+    if (courseSubIndex !== -1) {
+      const examIndex = student.subscribedCourses[courseSubIndex].examsPaid.findIndex(
+        (e) => e.examId.toString() === this._id.toString(),
+      )
+
+      if (examIndex === -1) {
+        student.subscribedCourses[courseSubIndex].examsPaid.push({
+          examId: this._id,
+          paymentStatus,
+          paidAt: new Date(),
+        })
+      } else {
+        student.subscribedCourses[courseSubIndex].examsPaid[examIndex].paymentStatus = paymentStatus
+        student.subscribedCourses[courseSubIndex].examsPaid[examIndex].paidAt = new Date()
       }
-      courseSubscription.paymentStatus = paymentStatus;
-      await student.save();
+
+      await student.save()
     }
   }
 
-  return true;
-};
+  return true
+}
 
 // ====================== CHECK STUDENT ACCESS ======================
 examSchema.methods.canAccess = function (studentId) {
   return this.subscribedStudents.some(
-    (s) => s.studentId.toString() === studentId.toString() && s.paymentStatus === 'paid'
-  );
-};
+    (s) => s.studentId.toString() === studentId.toString() && s.paymentStatus === "paid",
+  )
+}
 
 // ====================== VIRTUAL POPULATE QUESTIONS ======================
-examSchema.virtual('examQuestions', {
-  ref: 'Question',
-  localField: '_id',
-  foreignField: 'examId',
-});
+examSchema.virtual("examQuestions", {
+  ref: "Question",
+  localField: "_id",
+  foreignField: "examId",
+})
 
-module.exports = mongoose.model('Exam', examSchema);
+// ====================== PRE-SAVE VALIDATION FOR MAX QUESTIONS ======================
+examSchema.pre("save", async function (next) {
+  if (this.questions && this.questions.length > 50) {
+    return next(new Error("An exam cannot have more than 50 questions."))
+  }
+  next()
+})
+
+module.exports = mongoose.model("Exam", examSchema)
