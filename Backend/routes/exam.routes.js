@@ -13,6 +13,11 @@ router.use(authController.protect);
 // ======================== EXAMS ROUTES ======================
 // ============================================================
 
+// ---------- Dashboard Stats ----------
+router
+  .route('/dashboard/stats')
+  .get(examController.getExamDashboardStats);
+
 // ---------- Get All Exams / Create Exam ----------
 router
   .route('/')
