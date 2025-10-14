@@ -47,39 +47,33 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   ]
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      {/* Sidebar */}
+    <div className="flex h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <aside
         className={`${
-          sidebarOpen ? "w-64" : "w-20"
-        } bg-white border-r border-gray-200 flex flex-col transition-all duration-300 shadow-sm`}
+          sidebarOpen ? "w-72" : "w-20"
+        } bg-white border-r border-gray-200 flex flex-col transition-all duration-300 shadow-xl`}
       >
         {/* Header */}
         <div className="p-6 flex items-center justify-between border-b border-gray-200">
           {sidebarOpen && (
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
-                <GraduationCap className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <GraduationCap className="w-7 h-7 text-white" />
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <span className="text-2xl font-black bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                 ExamB
               </span>
             </div>
           )}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2.5 hover:bg-gray-100 rounded-xl transition-colors"
           >
-            {sidebarOpen ? (
-              <X className="w-5 h-5 text-gray-600" />
-            ) : (
-              <Menu className="w-5 h-5 text-gray-600" />
-            )}
+            {sidebarOpen ? <X className="w-5 h-5 text-gray-600" /> : <Menu className="w-5 h-5 text-gray-600" />}
           </button>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
           {menuItems.map((item) => {
             const Icon = item.icon
             const isActive = pathname === item.path
@@ -88,17 +82,17 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 key={item.name}
                 onClick={() => router.push(item.path)}
                 title={!sidebarOpen ? item.name : ""}
-                className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl transition-all group ${
+                className={`flex items-center gap-4 w-full px-4 py-3.5 rounded-2xl transition-all group ${
                   isActive
                     ? "bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg shadow-purple-500/30"
                     : "hover:bg-gray-100 text-gray-700"
                 }`}
               >
-                <Icon className="w-5 h-5 flex-shrink-0" />
+                <Icon className="w-6 h-6 flex-shrink-0" />
                 {sidebarOpen && (
                   <>
-                    <span className="text-sm font-medium flex-1 text-left">{item.name}</span>
-                    {isActive && <ChevronRight className="w-4 h-4" />}
+                    <span className="text-sm font-bold flex-1 text-left">{item.name}</span>
+                    {isActive && <ChevronRight className="w-5 h-5" />}
                   </>
                 )}
               </button>
@@ -106,22 +100,20 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           })}
         </nav>
 
-        {/* Logout Button */}
-        <div className="p-3 border-t border-gray-200">
+        <div className="p-4 border-t border-gray-200">
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl bg-gradient-to-r from-red-500 to-rose-600 text-white hover:shadow-lg hover:shadow-red-500/30 transition-all"
+            className="flex items-center gap-4 w-full px-4 py-3.5 rounded-2xl bg-gradient-to-r from-red-500 to-rose-600 text-white hover:shadow-lg hover:shadow-red-500/30 transition-all font-bold"
             title={!sidebarOpen ? "Logout" : ""}
           >
-            <LogOut className="w-5 h-5 flex-shrink-0" />
-            {sidebarOpen && <span className="text-sm font-medium">Logout</span>}
+            <LogOut className="w-6 h-6 flex-shrink-0" />
+            {sidebarOpen && <span className="text-sm">Logout</span>}
           </button>
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-auto bg-gray-50">
-        <div className="p-8">{children}</div>
+      <main className="flex-1 overflow-auto">
+        <div className="p-10">{children}</div>
       </main>
     </div>
   )
