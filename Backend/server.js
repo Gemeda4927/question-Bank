@@ -1,59 +1,59 @@
 // ====================== SERVER.JS ======================
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const colors = require('colors'); // optional, install with `npm i colors`
+const mongoose = require("mongoose")
+const dotenv = require("dotenv")
+const colors = require("colors") // optional, install with `npm i colors`
 
 // ====================== HANDLE SYNC ERRORS ======================
-process.on('uncaughtException', (err) => {
-  console.log('💥 UNCAUGHT EXCEPTION! Shutting down...');
-  console.log(`${err.name}: ${err.message}`.red.bold);
-  process.exit(1);
-});
+process.on("uncaughtException", (err) => {
+  console.log("💥 UNCAUGHT EXCEPTION! Shutting down...")
+  console.log(`${err.name}: ${err.message}`.red.bold)
+  process.exit(1)
+})
 
 // ====================== LOAD ENVIRONMENT VARIABLES ======================
-dotenv.config({ path: './config.env' });
+dotenv.config({ path: "./config.env" })
 
 // ====================== IMPORT APP ======================
-const app = require('./app');
+const app = require("./app")
 
 // ====================== MONGODB CONNECTION ======================
-const DB = process.env.DATABASE.replace(
-  '<PASSWORD>',
-  process.env.DATABASE_PASSWORD
-);
+const DB = process.env.DATABASE?.replace("<PASSWORD>", process.env.DATABASE_PASSWORD)
+
+if (!DB) {
+  console.error("❌ DATABASE connection string is missing in config.env".red.bold)
+  process.exit(1)
+}
 
 mongoose
-  .connect(DB, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log('✅ Database connection successful!'.green))
+  .connect(DB)
+  .then(() => console.log("✅ Database connection successful!".green))
   .catch((err) => {
-    console.log('❌ Database connection failed:'.red, err.message);
-  });
+    console.log("❌ Database connection failed:".red, err.message)
+    process.exit(1)
+  })
 
 // ====================== START SERVER ======================
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000
 
 const server = app.listen(PORT, () => {
-  console.log(`🚀 App running on port ${PORT} in ${process.env.NODE_ENV} mode`.cyan);
-});
+  console.log(`🚀 App running on port ${PORT} in ${process.env.NODE_ENV} mode`.cyan)
+})
 
 // ====================== HANDLE ASYNC ERRORS ======================
-process.on('unhandledRejection', (err) => {
-  console.log('💥 UNHANDLED REJECTION! Shutting down...');
-  console.log(`${err.name}: ${err.message}`.red.bold);
+process.on("unhandledRejection", (err) => {
+  console.log("💥 UNHANDLED REJECTION! Shutting down...")
+  console.log(`${err.name}: ${err.message}`.red.bold)
 
   server.close(() => {
-    process.exit(1);
-  });
-});
+    process.exit(1)
+  })
+})
 
 // ====================== OPTIONAL: GRACEFUL SHUTDOWN ON SIGTERM ======================
 // Useful when deploying to cloud providers like Heroku
-process.on('SIGTERM', () => {
-  console.log('⚡ SIGTERM RECEIVED. Shutting down gracefully...');
+process.on("SIGTERM", () => {
+  console.log("⚡ SIGTERM RECEIVED. Shutting down gracefully...")
   server.close(() => {
-    console.log('💤 Process terminated!');
-  });
-});
+    console.log("💤 Process terminated!")
+  })
+})

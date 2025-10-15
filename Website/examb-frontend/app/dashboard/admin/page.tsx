@@ -23,6 +23,8 @@ import {
   UserCheck,
   Award,
   BarChart3,
+  RefreshCw,
+  AlertTriangle,
 } from "lucide-react"
 
 interface Stats {
@@ -47,6 +49,8 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats | null>(null)
   const [loading, setLoading] = useState(true)
   const [userProfile, setUserProfile] = useState<any>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [refreshing, setRefreshing] = useState(false)
 
   useEffect(() => {
     fetchStats()
@@ -68,7 +72,10 @@ export default function AdminDashboard() {
 
   const fetchStats = async () => {
     try {
-      const [usersRes, universitiesRes, examsRes, coursesRes, questionsRes, paymentsRes] = await Promise.all([
+      setRefreshing(true)
+      setError(null)
+
+      const [usersRes, universitiesRes, examsRes, coursesRes, questionsRes, paymentsRes] = await Promise.allSettled([
         adminService.getUsers(),
         adminService.getUniversities(),
         adminService.getExams(),
@@ -78,17 +85,49 @@ export default function AdminDashboard() {
       ])
 
       setStats({
-        totalUsers: usersRes.data.totalCount || usersRes.data.length,
-        totalUniversities: universitiesRes.data.totalCount || universitiesRes.data.length,
-        totalExams: examsRes.data.totalCount || examsRes.data.length,
-        totalCourses: coursesRes.data.totalCount || coursesRes.data.length,
-        totalQuestions: questionsRes.data.totalCount || questionsRes.data.length,
-        totalPayments: paymentsRes.data.totalCount || paymentsRes.data.length,
+        totalUsers:
+          usersRes.status === "fulfilled" ? usersRes.value.data.totalCount || usersRes.value.data.length || 0 : 1247,
+        totalUniversities:
+          universitiesRes.status === "fulfilled"
+            ? universitiesRes.value.data.totalCount || universitiesRes.value.data.length || 0
+            : 45,
+        totalExams:
+          examsRes.status === "fulfilled" ? examsRes.value.data.totalCount || examsRes.value.data.length || 0 : 328,
+        totalCourses:
+          coursesRes.status === "fulfilled"
+            ? coursesRes.value.data.totalCount || coursesRes.value.data.length || 0
+            : 156,
+        totalQuestions:
+          questionsRes.status === "fulfilled"
+            ? questionsRes.value.data.totalCount || questionsRes.value.data.length || 0
+            : 4892,
+        totalPayments:
+          paymentsRes.status === "fulfilled"
+            ? paymentsRes.value.data.totalCount || paymentsRes.value.data.length || 0
+            : 892,
       })
+
+      const failedRequests = [usersRes, universitiesRes, examsRes, coursesRes, questionsRes, paymentsRes].filter(
+        (res) => res.status === "rejected",
+      )
+
+      if (failedRequests.length > 0) {
+        setError(`Using placeholder data. ${failedRequests.length} API call(s) failed.`)
+      }
     } catch (error) {
       console.error("Error fetching stats:", error)
+      setStats({
+        totalUsers: 1247,
+        totalUniversities: 45,
+        totalExams: 328,
+        totalCourses: 156,
+        totalQuestions: 4892,
+        totalPayments: 892,
+      })
+      setError("Unable to connect to server. Showing placeholder data.")
     } finally {
       setLoading(false)
+      setRefreshing(false)
     }
   }
 
@@ -239,70 +278,109 @@ export default function AdminDashboard() {
     },
   ]
 
+  if (loading) {
+    return (
+      <ProtectedRoute allowedRole="admin">
+        <AdminLayout>
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="text-center space-y-6">
+              <div className="relative w-24 h-24 mx-auto">
+                <div className="absolute inset-0 border-4 border-purple-200 rounded-full animate-ping"></div>
+                <div className="relative w-24 h-24 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+              </div>
+              <div>
+                <h2 className="text-2xl font-black text-gray-900 mb-2">Loading Dashboard</h2>
+                <p className="text-gray-600 font-medium">Gathering your analytics...</p>
+              </div>
+            </div>
+          </div>
+        </AdminLayout>
+      </ProtectedRoute>
+    )
+  }
+
   return (
     <ProtectedRoute allowedRole="admin">
       <AdminLayout>
-        <div className="mb-8 flex items-center justify-between">
+        {error && (
+          <div className="mb-6 p-4 bg-yellow-50 border-2 border-yellow-200 rounded-2xl flex items-start gap-3 animate-fadeIn">
+            <AlertTriangle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="font-bold text-yellow-900 mb-1">Connection Issue</p>
+              <p className="text-sm text-yellow-700">{error}</p>
+            </div>
+            <button
+              onClick={fetchStats}
+              disabled={refreshing}
+              className="px-4 py-2 bg-yellow-600 text-white font-bold rounded-lg hover:bg-yellow-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+            >
+              <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />
+              Retry
+            </button>
+          </div>
+        )}
+
+        <div className="mb-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
           <div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl shadow-lg">
-                <Sparkles className="w-6 h-6 text-white" />
+            <div className="flex items-center gap-4 mb-3">
+              <div className="p-3 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl shadow-lg">
+                <Sparkles className="w-7 h-7 text-white" />
               </div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
+              <h1 className="text-5xl font-black bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
                 Welcome back, {userProfile?.name || "Admin"}!
               </h1>
             </div>
-            <p className="text-gray-600 text-base ml-14">Here's what's happening with your platform today.</p>
+            <p className="text-gray-600 text-lg ml-16">Here's what's happening with your platform today.</p>
           </div>
-          <div className="hidden lg:flex items-center gap-4 bg-white rounded-2xl p-4 shadow-lg border border-gray-100">
-            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+          <div className="hidden lg:flex items-center gap-4 bg-white rounded-2xl p-5 shadow-lg border border-gray-100">
+            <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-md">
               {userProfile?.name?.charAt(0) || "A"}
             </div>
             <div>
-              <p className="font-semibold text-gray-900">{userProfile?.name || "Admin User"}</p>
+              <p className="font-bold text-gray-900 text-lg">{userProfile?.name || "Admin User"}</p>
               <p className="text-sm text-gray-500">{userProfile?.email || "admin@examb.com"}</p>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           {performanceMetrics.map((metric, index) => {
             const MetricIcon = metric.icon
             return (
               <div
                 key={metric.label}
-                className="bg-white rounded-xl p-5 border border-gray-100 hover:shadow-lg transition-all duration-300 animate-fadeIn"
+                className="bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-all duration-300 animate-fadeIn hover:-translate-y-1"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
-                <div className="flex items-center justify-between mb-3">
-                  <div className={`p-2.5 bg-gradient-to-br ${metric.color} rounded-lg`}>
-                    <MetricIcon className="w-5 h-5 text-white" />
+                <div className="flex items-center justify-between mb-4">
+                  <div className={`p-3 bg-gradient-to-br ${metric.color} rounded-xl shadow-md`}>
+                    <MetricIcon className="w-6 h-6 text-white" />
                   </div>
                   <div
-                    className={`flex items-center gap-1 text-sm font-semibold ${
-                      metric.positive ? "text-emerald-600" : "text-red-600"
+                    className={`flex items-center gap-1.5 text-sm font-bold px-3 py-1.5 rounded-full ${
+                      metric.positive ? "text-emerald-600 bg-emerald-50" : "text-red-600 bg-red-50"
                     }`}
                   >
                     {metric.positive ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
                     {metric.change}
                   </div>
                 </div>
-                <p className="text-2xl font-bold text-gray-900 mb-1">{metric.value}</p>
-                <p className="text-sm text-gray-500">{metric.label}</p>
+                <p className="text-3xl font-black text-gray-900 mb-2">{metric.value}</p>
+                <p className="text-sm text-gray-600 font-medium">{metric.label}</p>
               </div>
             )
           })}
         </div>
 
         {!loading && stats && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-10">
             {statCards.map((stat, index) => {
               const Icon = stat.icon
               return (
                 <div
                   key={stat.title}
                   onClick={() => (window.location.href = stat.path)}
-                  className="group relative bg-white rounded-2xl p-6 cursor-pointer hover:shadow-2xl transition-all duration-500 border border-gray-100 overflow-hidden animate-fadeIn"
+                  className="group relative bg-white rounded-3xl p-8 cursor-pointer hover:shadow-2xl transition-all duration-500 border border-gray-100 overflow-hidden animate-fadeIn hover:-translate-y-2"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <div
@@ -310,35 +388,35 @@ export default function AdminDashboard() {
                   />
 
                   <div className="relative z-10">
-                    <div className="flex items-start justify-between mb-5">
+                    <div className="flex items-start justify-between mb-6">
                       <div
-                        className={`p-3.5 rounded-xl ${stat.iconBg} shadow-lg group-hover:scale-110 transition-transform duration-300`}
+                        className={`p-4 rounded-2xl ${stat.iconBg} shadow-lg group-hover:scale-110 transition-transform duration-300`}
                       >
-                        <Icon className="w-7 h-7 text-white" />
+                        <Icon className="w-8 h-8 text-white" />
                       </div>
                       <div
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${
+                        className={`flex items-center gap-2 px-4 py-2 rounded-full ${
                           stat.changePositive ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"
-                        } text-sm font-semibold`}
+                        } text-sm font-bold shadow-sm`}
                       >
                         <TrendingUp className="w-4 h-4" />
                         {stat.change}
                       </div>
                     </div>
 
-                    <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">{stat.title}</h3>
-                    <p className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-4">
+                    <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">{stat.title}</h3>
+                    <p className="text-5xl font-black bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-5">
                       {stat.value?.toLocaleString() || 0}
                     </p>
 
-                    <div className="flex items-center text-sm font-medium text-gray-600 group-hover:text-purple-600 transition-colors">
+                    <div className="flex items-center text-sm font-bold text-gray-600 group-hover:text-purple-600 transition-colors">
                       View details
-                      <ArrowUpRight className="w-4 h-4 ml-1 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
+                      <ArrowUpRight className="w-5 h-5 ml-2 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
                     </div>
                   </div>
 
                   <div
-                    className={`absolute -bottom-8 -right-8 w-32 h-32 bg-gradient-to-br ${stat.gradient} rounded-full opacity-10 group-hover:opacity-20 transition-opacity duration-500`}
+                    className={`absolute -bottom-10 -right-10 w-40 h-40 bg-gradient-to-br ${stat.gradient} rounded-full opacity-10 group-hover:opacity-20 transition-opacity duration-500`}
                   />
                 </div>
               )
@@ -346,14 +424,14 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
           {/* Recent Activity */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2.5 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl">
-                <Activity className="w-5 h-5 text-white" />
+          <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="p-3 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl shadow-md">
+                <Activity className="w-6 h-6 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900">Recent Activity</h2>
+              <h2 className="text-3xl font-black text-gray-900">Recent Activity</h2>
             </div>
 
             <div className="space-y-4">
@@ -362,16 +440,16 @@ export default function AdminDashboard() {
                 return (
                   <div
                     key={activity.id}
-                    className="flex items-start gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors duration-200 animate-fadeIn"
+                    className="flex items-start gap-4 p-5 rounded-2xl hover:bg-gray-50 transition-colors duration-200 animate-fadeIn border border-transparent hover:border-gray-200"
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
-                    <div className={`p-2 rounded-lg bg-gray-100 ${activity.color}`}>
+                    <div className={`p-3 rounded-xl bg-gray-100 ${activity.color} shadow-sm`}>
                       <ActivityIcon className="w-5 h-5" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 mb-1">{activity.message}</p>
-                      <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                        <Clock className="w-3.5 h-3.5" />
+                      <p className="text-sm font-semibold text-gray-900 mb-2">{activity.message}</p>
+                      <div className="flex items-center gap-2 text-xs text-gray-500 font-medium">
+                        <Clock className="w-4 h-4" />
                         {activity.time}
                       </div>
                     </div>
@@ -382,15 +460,15 @@ export default function AdminDashboard() {
           </div>
 
           {/* Quick Actions */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2.5 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl">
-                <Activity className="w-5 h-5 text-white" />
+          <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl shadow-md">
+                <Activity className="w-6 h-6 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900">Quick Actions</h2>
+              <h2 className="text-3xl font-black text-gray-900">Quick Actions</h2>
             </div>
 
-            <div className="grid grid-cols-1 gap-3">
+            <div className="grid grid-cols-1 gap-4">
               {[
                 {
                   title: "Manage Users",
@@ -426,20 +504,20 @@ export default function AdminDashboard() {
                   <button
                     key={action.title}
                     onClick={() => (window.location.href = action.path)}
-                    className="group relative p-4 border-2 border-gray-100 rounded-xl hover:border-transparent hover:shadow-lg transition-all duration-300 text-left overflow-hidden animate-fadeIn"
+                    className="group relative p-5 border-2 border-gray-100 rounded-2xl hover:border-transparent hover:shadow-xl transition-all duration-300 text-left overflow-hidden animate-fadeIn"
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-4">
                       <div
-                        className={`p-2.5 bg-gradient-to-br ${action.gradient} rounded-lg group-hover:scale-110 transition-transform duration-300`}
+                        className={`p-3 bg-gradient-to-br ${action.gradient} rounded-xl group-hover:scale-110 transition-transform duration-300 shadow-md`}
                       >
-                        <ActionIcon className="w-5 h-5 text-white" />
+                        <ActionIcon className="w-6 h-6 text-white" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-bold text-gray-900 mb-0.5">{action.title}</h3>
-                        <p className="text-xs text-gray-600">{action.desc}</p>
+                        <h3 className="font-black text-gray-900 mb-1 text-lg">{action.title}</h3>
+                        <p className="text-sm text-gray-600 font-medium">{action.desc}</p>
                       </div>
-                      <ArrowUpRight className="w-5 h-5 text-gray-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-300" />
+                      <ArrowUpRight className="w-6 h-6 text-gray-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-300" />
                     </div>
                   </button>
                 )
@@ -448,37 +526,37 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-2.5 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl">
-              <AlertCircle className="w-5 h-5 text-white" />
+        <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100">
+          <div className="flex items-center gap-4 mb-8">
+            <div className="p-3 bg-gradient-to-br from-orange-500 to-amber-600 rounded-2xl shadow-md">
+              <AlertCircle className="w-6 h-6 text-white" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900">System Status</h2>
+            <h2 className="text-3xl font-black text-gray-900">System Status</h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200">
-              <div className="flex items-center gap-3 mb-2">
-                <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                <span className="font-semibold text-emerald-900">All Systems Operational</span>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="p-6 rounded-2xl bg-emerald-50 border-2 border-emerald-200 shadow-sm">
+              <div className="flex items-center gap-3 mb-3">
+                <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+                <span className="font-black text-emerald-900 text-lg">All Systems Operational</span>
               </div>
-              <p className="text-sm text-emerald-700">Platform running smoothly</p>
+              <p className="text-sm text-emerald-700 font-medium">Platform running smoothly</p>
             </div>
 
-            <div className="p-4 rounded-xl bg-blue-50 border border-blue-200">
-              <div className="flex items-center gap-3 mb-2">
-                <Calendar className="w-5 h-5 text-blue-600" />
-                <span className="font-semibold text-blue-900">Last Backup</span>
+            <div className="p-6 rounded-2xl bg-blue-50 border-2 border-blue-200 shadow-sm">
+              <div className="flex items-center gap-3 mb-3">
+                <Calendar className="w-6 h-6 text-blue-600" />
+                <span className="font-black text-blue-900 text-lg">Last Backup</span>
               </div>
-              <p className="text-sm text-blue-700">2 hours ago</p>
+              <p className="text-sm text-blue-700 font-medium">2 hours ago</p>
             </div>
 
-            <div className="p-4 rounded-xl bg-purple-50 border border-purple-200">
-              <div className="flex items-center gap-3 mb-2">
-                <Activity className="w-5 h-5 text-purple-600" />
-                <span className="font-semibold text-purple-900">Server Uptime</span>
+            <div className="p-6 rounded-2xl bg-purple-50 border-2 border-purple-200 shadow-sm">
+              <div className="flex items-center gap-3 mb-3">
+                <Activity className="w-6 h-6 text-purple-600" />
+                <span className="font-black text-purple-900 text-lg">Server Uptime</span>
               </div>
-              <p className="text-sm text-purple-700">99.9% (30 days)</p>
+              <p className="text-sm text-purple-700 font-medium">99.9% (30 days)</p>
             </div>
           </div>
         </div>

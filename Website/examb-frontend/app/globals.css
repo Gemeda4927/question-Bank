@@ -140,7 +140,7 @@
 @keyframes fadeInScale {
   from {
     opacity: 0;
-    transform: scale(0.9);
+    transform: scale(0.95);
   }
   to {
     opacity: 1;
@@ -151,7 +151,7 @@
 @keyframes slideInLeft {
   from {
     opacity: 0;
-    transform: translateX(-50px);
+    transform: translateX(-30px);
   }
   to {
     opacity: 1;
@@ -162,7 +162,7 @@
 @keyframes slideInRight {
   from {
     opacity: 0;
-    transform: translateX(50px);
+    transform: translateX(30px);
   }
   to {
     opacity: 1;
@@ -173,7 +173,7 @@
 @keyframes slideInUp {
   from {
     opacity: 0;
-    transform: translateY(50px);
+    transform: translateY(30px);
   }
   to {
     opacity: 1;
@@ -187,19 +187,19 @@
     transform: translateY(0px);
   }
   50% {
-    transform: translateY(-25px);
+    transform: translateY(-20px);
   }
 }
 
 @keyframes pulse-glow {
   0%,
   100% {
-    opacity: 0.4;
+    opacity: 0.5;
     transform: scale(1);
   }
   50% {
-    opacity: 0.8;
-    transform: scale(1.1);
+    opacity: 0.9;
+    transform: scale(1.05);
   }
 }
 
@@ -237,7 +237,7 @@
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-8px);
   }
 }
 
@@ -247,47 +247,47 @@
     transform: scale(1);
   }
   50% {
-    transform: scale(1.05);
+    transform: scale(1.03);
   }
 }
 
 .animate-fadeIn {
-  animation: fadeIn 0.8s ease-out forwards;
+  animation: fadeIn 0.6s ease-out forwards;
 }
 
 .animate-fadeInScale {
-  animation: fadeInScale 0.6s ease-out forwards;
+  animation: fadeInScale 0.5s ease-out forwards;
 }
 
 .animate-slideInLeft {
-  animation: slideInLeft 0.8s ease-out forwards;
+  animation: slideInLeft 0.6s ease-out forwards;
 }
 
 .animate-slideInRight {
-  animation: slideInRight 0.8s ease-out forwards;
+  animation: slideInRight 0.6s ease-out forwards;
 }
 
 .animate-slideInUp {
-  animation: slideInUp 0.8s ease-out forwards;
+  animation: slideInUp 0.6s ease-out forwards;
 }
 
 .animate-float {
-  animation: float 4s ease-in-out infinite;
+  animation: float 3s ease-in-out infinite;
 }
 
 .animate-pulse-glow {
-  animation: pulse-glow 3s ease-in-out infinite;
+  animation: pulse-glow 2.5s ease-in-out infinite;
 }
 
 .animate-shimmer {
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
   background-size: 1000px 100%;
   animation: shimmer 2s infinite;
 }
 
 .animate-gradient {
   background-size: 200% 200%;
-  animation: gradient-shift 4s ease infinite;
+  animation: gradient-shift 3s ease infinite;
 }
 
 .animate-rotate {
@@ -318,8 +318,17 @@
 .delay-500 {
   animation-delay: 0.5s;
 }
+.delay-600 {
+  animation-delay: 0.6s;
+}
 .delay-700 {
   animation-delay: 0.7s;
+}
+.delay-800 {
+  animation-delay: 0.8s;
+}
+.delay-900 {
+  animation-delay: 0.9s;
 }
 .delay-1000 {
   animation-delay: 1s;
@@ -327,33 +336,49 @@
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 12px;
+  height: 12px;
 }
 
 ::-webkit-scrollbar-track {
   background: oklch(0.97 0 0);
+  border-radius: 6px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: oklch(0.708 0 0);
-  border-radius: 5px;
+  background: oklch(0.7 0.05 250);
+  border-radius: 6px;
+  border: 2px solid oklch(0.97 0 0);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: oklch(0.556 0 0);
+  background: oklch(0.55 0.15 250);
 }
 
 /* Glassmorphism utility classes */
 .glass {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 .glass-strong {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Enhanced card shadows */
+.shadow-card {
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+
+.shadow-card-hover {
+  box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+.shadow-card-lg {
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 }

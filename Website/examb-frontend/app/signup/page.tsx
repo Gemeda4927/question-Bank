@@ -24,7 +24,7 @@ export default function SignupPage() {
     setLoading(true)
 
     try {
-      const { data } = await api.post("/users/signup", {
+      const { data } = await api.post("v1/users/signup", {
         name,
         email,
         password,

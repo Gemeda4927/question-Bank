@@ -1,28 +1,33 @@
 const express = require('express');
 const courseController = require('../controllers/course.controller');
+const auth = require('../controllers/auth.controller');
+const paymentMiddleware = require('../middleware/payment.middleware');
+
 const router = express.Router();
 
-// ======================== ROUTES ========================
-router
-  .route('/')
-  .get(courseController.getAllCourses)
-  .post(courseController.createCourse);
+// ======================== PUBLIC ROUTES ========================
+router.get('/', courseController.getAllCourses);
+router.get('/:id', courseController.getCourseById);
 
-router
-  .route('/:id')
-  .get(courseController.getCourseById)
-  .put(courseController.updateCourse);
+// ======================== PROTECTED ROUTES ========================
+router.use(auth.protect); 
 
-router
-  .route('/soft/:id')
-  .delete(courseController.softDeleteCourse);
+// ======================== STUDENT ROUTES ========================
+router.get('/student/my-courses', courseController.getStudentCourses);
+router.get('/:id/enrollment-status', courseController.getEnrollmentStatus);
 
-router
-  .route('/restore/:id')
-  .patch(courseController.restoreCourse);
+// Payment routes
+router.post('/:id/payment', paymentMiddleware.initiateCoursePayment);       
+router.post('/:id/exam-payment', paymentMiddleware.initiateExamPayment); 
 
-router
-  .route('/hard/:id')
-  .delete(courseController.hardDeleteCourse);
+// ======================== ADMIN/INSTRUCTOR ROUTES ========================
+router.use(auth.restrictTo('admin', 'instructor'));
+
+// Course management
+router.post('/', courseController.createCourse);
+router.put('/:id', courseController.updateCourse);
+router.delete('/soft/:id', courseController.softDeleteCourse);
+router.patch('/restore/:id', courseController.restoreCourse);
+router.delete('/hard/:id', courseController.hardDeleteCourse);
 
 module.exports = router;
