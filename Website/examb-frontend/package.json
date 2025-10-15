@@ -1,12 +1,16 @@
 {
-  "name": "my-v0-project",
-  "version": "0.1.0",
+  "name": "examb-frontend",
+  "version": "1.0.0",
   "private": true,
+  "description": "Modern exam management platform",
+  "author": "ExamB Team",
+  "license": "MIT",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint .",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -38,20 +42,22 @@
     "@radix-ui/react-toggle-group": "1.1.1",
     "@radix-ui/react-tooltip": "1.1.6",
     "@vercel/analytics": "1.3.1",
+    "axios": "^1.7.9",
     "autoprefixer": "^10.4.20",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "1.0.4",
     "date-fns": "4.1.0",
     "embla-carousel-react": "8.5.1",
+    "framer-motion": "^11.15.0",
     "geist": "^1.3.1",
     "input-otp": "1.4.1",
     "lucide-react": "^0.454.0",
     "next": "15.5.4",
     "next-themes": "^0.4.6",
-    "react": "19.1.0",
+    "react": "^18.2.0",
     "react-day-picker": "9.8.0",
-    "react-dom": "19.1.0",
+    "react-dom": "^18.2.0",
     "react-hook-form": "^7.60.0",
     "react-resizable-panels": "^2.1.7",
     "recharts": "2.15.4",
@@ -60,9 +66,7 @@
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.9",
     "zod": "3.25.76",
-    "framer-motion": "12.23.24",
     "canvas-confetti": "1.9.3",
-    "axios": "1.12.2",
     "path": "0.12.7",
     "url": "0.11.4",
     "@eslint/eslintrc": "3.3.1",
@@ -71,11 +75,15 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.9",
     "@types/node": "^22",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/react": "^18.2.21",
+    "@types/react-dom": "^18.2.6",
     "postcss": "^8.5",
     "tailwindcss": "^4.1.9",
     "tw-animate-css": "1.3.3",
     "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   }
 }

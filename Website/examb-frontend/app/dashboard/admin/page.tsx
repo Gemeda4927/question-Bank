@@ -23,6 +23,8 @@ import {
   UserCheck,
   Award,
   BarChart3,
+  RefreshCw,
+  AlertTriangle,
 } from "lucide-react"
 
 interface Stats {
@@ -47,6 +49,8 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats | null>(null)
   const [loading, setLoading] = useState(true)
   const [userProfile, setUserProfile] = useState<any>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [refreshing, setRefreshing] = useState(false)
 
   useEffect(() => {
     fetchStats()
@@ -68,7 +72,10 @@ export default function AdminDashboard() {
 
   const fetchStats = async () => {
     try {
-      const [usersRes, universitiesRes, examsRes, coursesRes, questionsRes, paymentsRes] = await Promise.all([
+      setRefreshing(true)
+      setError(null)
+
+      const [usersRes, universitiesRes, examsRes, coursesRes, questionsRes, paymentsRes] = await Promise.allSettled([
         adminService.getUsers(),
         adminService.getUniversities(),
         adminService.getExams(),
@@ -78,17 +85,49 @@ export default function AdminDashboard() {
       ])
 
       setStats({
-        totalUsers: usersRes.data.totalCount || usersRes.data.length,
-        totalUniversities: universitiesRes.data.totalCount || universitiesRes.data.length,
-        totalExams: examsRes.data.totalCount || examsRes.data.length,
-        totalCourses: coursesRes.data.totalCount || coursesRes.data.length,
-        totalQuestions: questionsRes.data.totalCount || questionsRes.data.length,
-        totalPayments: paymentsRes.data.totalCount || paymentsRes.data.length,
+        totalUsers:
+          usersRes.status === "fulfilled" ? usersRes.value.data.totalCount || usersRes.value.data.length || 0 : 1247,
+        totalUniversities:
+          universitiesRes.status === "fulfilled"
+            ? universitiesRes.value.data.totalCount || universitiesRes.value.data.length || 0
+            : 45,
+        totalExams:
+          examsRes.status === "fulfilled" ? examsRes.value.data.totalCount || examsRes.value.data.length || 0 : 328,
+        totalCourses:
+          coursesRes.status === "fulfilled"
+            ? coursesRes.value.data.totalCount || coursesRes.value.data.length || 0
+            : 156,
+        totalQuestions:
+          questionsRes.status === "fulfilled"
+            ? questionsRes.value.data.totalCount || questionsRes.value.data.length || 0
+            : 4892,
+        totalPayments:
+          paymentsRes.status === "fulfilled"
+            ? paymentsRes.value.data.totalCount || paymentsRes.value.data.length || 0
+            : 892,
       })
+
+      const failedRequests = [usersRes, universitiesRes, examsRes, coursesRes, questionsRes, paymentsRes].filter(
+        (res) => res.status === "rejected",
+      )
+
+      if (failedRequests.length > 0) {
+        setError(`Using placeholder data. ${failedRequests.length} API call(s) failed.`)
+      }
     } catch (error) {
       console.error("Error fetching stats:", error)
+      setStats({
+        totalUsers: 1247,
+        totalUniversities: 45,
+        totalExams: 328,
+        totalCourses: 156,
+        totalQuestions: 4892,
+        totalPayments: 892,
+      })
+      setError("Unable to connect to server. Showing placeholder data.")
     } finally {
       setLoading(false)
+      setRefreshing(false)
     }
   }
 
@@ -239,9 +278,48 @@ export default function AdminDashboard() {
     },
   ]
 
+  if (loading) {
+    return (
+      <ProtectedRoute allowedRole="admin">
+        <AdminLayout>
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="text-center space-y-6">
+              <div className="relative w-24 h-24 mx-auto">
+                <div className="absolute inset-0 border-4 border-purple-200 rounded-full animate-ping"></div>
+                <div className="relative w-24 h-24 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+              </div>
+              <div>
+                <h2 className="text-2xl font-black text-gray-900 mb-2">Loading Dashboard</h2>
+                <p className="text-gray-600 font-medium">Gathering your analytics...</p>
+              </div>
+            </div>
+          </div>
+        </AdminLayout>
+      </ProtectedRoute>
+    )
+  }
+
   return (
     <ProtectedRoute allowedRole="admin">
       <AdminLayout>
+        {error && (
+          <div className="mb-6 p-4 bg-yellow-50 border-2 border-yellow-200 rounded-2xl flex items-start gap-3 animate-fadeIn">
+            <AlertTriangle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="font-bold text-yellow-900 mb-1">Connection Issue</p>
+              <p className="text-sm text-yellow-700">{error}</p>
+            </div>
+            <button
+              onClick={fetchStats}
+              disabled={refreshing}
+              className="px-4 py-2 bg-yellow-600 text-white font-bold rounded-lg hover:bg-yellow-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+            >
+              <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />
+              Retry
+            </button>
+          </div>
+        )}
+
         <div className="mb-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
           <div>
             <div className="flex items-center gap-4 mb-3">

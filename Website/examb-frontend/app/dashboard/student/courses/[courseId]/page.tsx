@@ -21,20 +21,37 @@ import {
   Users,
 } from "lucide-react"
 
-export default function CoursePage({ params }: { params: { courseId: string } }) {
+interface CoursePageProps {
+  params: Promise<{ courseId: string }>
+}
+
+export default function CoursePage({ params }: CoursePageProps) {
   const [course, setCourse] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [paymentLoading, setPaymentLoading] = useState<string | null>(null)
+  const [resolvedParams, setResolvedParams] = useState<{ courseId: string } | null>(null)
 
   const router = useRouter()
-  const studentId = localStorage.getItem("student") ? JSON.parse(localStorage.getItem("student") || "{}")._id : null
+
+  // Resolve the async params
+  useEffect(() => {
+    const resolveParams = async () => {
+      const resolved = await params
+      setResolvedParams(resolved)
+    }
+    resolveParams()
+  }, [params])
 
   useEffect(() => {
-    fetchCourse()
-  }, [params.courseId])
+    if (resolvedParams) {
+      fetchCourse()
+    }
+  }, [resolvedParams])
 
   const fetchCourse = async () => {
+    if (!resolvedParams) return
+
     try {
       setLoading(true)
       const token = localStorage.getItem("token")
@@ -43,13 +60,21 @@ export default function CoursePage({ params }: { params: { courseId: string } })
         return
       }
 
+      const student = localStorage.getItem("student")
+      if (!student) {
+        setError("Student data not found")
+        return
+      }
+
+      const studentId = JSON.parse(student)._id
+
       const response = await studentService.getAllCourses()
       const allCourses = response.data.data || response.data
       if (!allCourses || !Array.isArray(allCourses)) {
         throw new Error("Invalid API response format")
       }
 
-      const foundCourse = allCourses.find((c: any) => c._id === params.courseId)
+      const foundCourse = allCourses.find((c: any) => c._id === resolvedParams.courseId)
       if (!foundCourse) {
         setError("Course not found")
       } else {
@@ -65,9 +90,11 @@ export default function CoursePage({ params }: { params: { courseId: string } })
   }
 
   const handleCoursePayment = async () => {
+    if (!resolvedParams) return
+
     try {
       setPaymentLoading("course")
-      const response = await studentService.initializeCoursePayment(params.courseId)
+      const response = await studentService.initializeCoursePayment(resolvedParams.courseId)
       const checkoutUrl = response.data?.checkout_url || response.data?.data?.checkout_url
 
       if (checkoutUrl) {
@@ -85,9 +112,11 @@ export default function CoursePage({ params }: { params: { courseId: string } })
   }
 
   const handleExamPayment = async (examId: string, examName: string) => {
+    if (!resolvedParams) return
+
     try {
       setPaymentLoading(examId)
-      const response = await studentService.initializeExamPayment(examId, params.courseId)
+      const response = await studentService.initializeExamPayment(examId, resolvedParams.courseId)
       const checkoutUrl = response.data?.checkout_url || response.data?.data?.checkout_url
 
       if (checkoutUrl) {
@@ -105,9 +134,11 @@ export default function CoursePage({ params }: { params: { courseId: string } })
   }
 
   const handleEnroll = async () => {
+    if (!resolvedParams) return
+
     try {
       setPaymentLoading("enroll")
-      await studentService.enrollCourse(params.courseId)
+      await studentService.enrollCourse(resolvedParams.courseId)
       alert("Successfully enrolled! You can now purchase the course or individual exams.")
       fetchCourse()
     } catch (error: any) {
@@ -118,7 +149,19 @@ export default function CoursePage({ params }: { params: { courseId: string } })
     }
   }
 
-  if (loading) {
+  // Get student ID safely
+  const getStudentId = () => {
+    try {
+      const student = localStorage.getItem("student")
+      return student ? JSON.parse(student)._id : null
+    } catch {
+      return null
+    }
+  }
+
+  const studentId = getStudentId()
+
+  if (loading || !resolvedParams) {
     return (
       <ProtectedRoute allowedRole="student">
         <StudentLayout>

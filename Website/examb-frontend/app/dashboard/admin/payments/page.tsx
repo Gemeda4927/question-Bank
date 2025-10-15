@@ -108,7 +108,6 @@ export default function PaymentsPage() {
           title="All Payments"
           columns={paymentColumns}
           service={adminService}
-          hideCreate={true}
         />
       </AdminLayout>
     </ProtectedRoute>

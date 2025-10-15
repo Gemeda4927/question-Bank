@@ -275,13 +275,7 @@ export default function UsersPage() {
           service={adminService}
           createForm={UserForm}
           onEdit={handleEdit}
-          onDelete={handleDelete}
-          onSoftDelete={handleSoftDelete}
-          onRestore={
-            activeTab === "deleted"
-              ? handleRestore
-              : undefined
-          }
+    
         />
 
         {/* Edit Modal */}

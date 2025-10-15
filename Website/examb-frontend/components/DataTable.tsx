@@ -15,7 +15,6 @@ interface DataTableProps {
   }[]
   service: any
   onEdit?: (item: any) => void
-  onDelete?: (id: string) => Promise<void>
   createForm?: React.ComponentType<any>
 }
 

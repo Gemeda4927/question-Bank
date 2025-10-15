@@ -5,31 +5,41 @@ const Course = require('../models/course.model');
 const User = require('../models/user.model');
 const Question = require('../models/question.model');
 
-/* ============================================================
-   📘 CREATE EXAM
-============================================================ */
+// ====================== CREATE EXAM ======================
 exports.createExam = async (req, res) => {
   try {
     const {
       name,
       code,
       courseId,
-      type = 'final',
+      type = "final",
       description,
       date,
       duration,
       totalMarks,
       passingMarks,
+      price = 0,
       questions = [],
     } = req.body;
 
-    if (!courseId) {
+    // ------------------ VALIDATIONS ------------------
+    if (!name || !code || !courseId || !date || !duration || totalMarks === undefined || passingMarks === undefined) {
       return res.status(400).json({
-        status: 'fail',
-        message: 'Course ID is required.',
+        status: "fail",
+        message: "Missing required fields: name, code, courseId, date, duration, totalMarks, passingMarks",
       });
     }
 
+    // Check if course exists
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Course not found",
+      });
+    }
+
+    // ------------------ CREATE EXAM ------------------
     const exam = await Exam.create({
       name,
       code,
@@ -40,28 +50,32 @@ exports.createExam = async (req, res) => {
       duration,
       totalMarks,
       passingMarks,
+      price,
       questions,
     });
 
     // Link exam to course
     await Course.findByIdAndUpdate(courseId, { $push: { exams: exam._id } });
 
+    // Populate exam for response
     const populatedExam = await Exam.findById(exam._id)
-      .populate('courseId', 'name code')
+      .populate("courseId", "name code")
       .populate({
-        path: 'questions',
-        select: 'text type marks options correctAnswer imageUrl category',
+        path: "questions",
+        select: "text type marks options correctAnswer imageUrl category",
       });
 
     res.status(201).json({
-      status: 'success',
-      message: '🎉 Exam created successfully!',
+      status: "success",
+      message: "🎉 Exam created successfully!",
       data: populatedExam,
     });
   } catch (error) {
-    res.status(500).json({ status: 'error', message: error.message });
+    console.error("❌ Create exam error:", error);
+    res.status(500).json({ status: "error", message: error.message });
   }
 };
+
 
 /* ============================================================
    📋 GET ALL EXAMS
