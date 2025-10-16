@@ -23,8 +23,8 @@ interface StudentLayoutProps {
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard/student", color: "text-blue-500" },
   { icon: ShoppingCart, label: "Marketplace", path: "/dashboard/student/marketplace", color: "text-green-500" },
-  { icon: FileText, label: "My Exams", path: "/dashboard/student/exams", color: "text-orange-500" },
-  { icon: BookOpen, label: "My Courses", path: "/dashboard/student/courses", color: "text-purple-500" },
+  { icon: FileText, label: "My Exams", path: "/dashboard/student/myexams", color: "text-orange-500" },
+  { icon: BookOpen, label: "My Courses", path: "/dashboard/student/mycourse", color: "text-purple-500" },
   { icon: BarChart3, label: "Results", path: "/dashboard/student/results", color: "text-pink-500" },
   { icon: User, label: "Profile", path: "/dashboard/student/profile", color: "text-indigo-500" },
 ]
