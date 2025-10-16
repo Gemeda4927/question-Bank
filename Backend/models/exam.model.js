@@ -14,11 +14,20 @@ const examSchema = new mongoose.Schema(
       uppercase: true,
       trim: true,
     },
+
+    // 🔗 Foreign Keys
     courseId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Course",
       required: [true, "Exam must belong to a course"],
     },
+    universityId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "University",
+      required: [true, "Exam must belong to a university"],
+    },
+
+    // 🧾 Exam Details
     type: {
       type: String,
       enum: ["midterm", "final", "quiz", "assignment"],
@@ -49,9 +58,11 @@ const examSchema = new mongoose.Schema(
     },
     price: {
       type: Number,
-      default: 0, // allow custom exam pricing
+      default: 0,
       min: 0,
     },
+
+    // 🧠 Relations
     questions: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -69,6 +80,8 @@ const examSchema = new mongoose.Schema(
         subscribedAt: { type: Date, default: Date.now },
       },
     ],
+
+    // ⚙️ Flags
     isDeleted: {
       type: Boolean,
       default: false,
@@ -81,7 +94,6 @@ const examSchema = new mongoose.Schema(
 examSchema.methods.addStudent = async function (studentId, paymentStatus = "paid") {
   const User = mongoose.model("User");
 
-  // Update or add student in exam
   const existingIndex = this.subscribedStudents.findIndex(
     (s) => s.studentId.toString() === studentId.toString()
   );
@@ -94,7 +106,6 @@ examSchema.methods.addStudent = async function (studentId, paymentStatus = "paid
 
   await this.save();
 
-  // Update student record
   const student = await User.findById(studentId);
   if (student) {
     const courseSubIndex = student.subscribedCourses.findIndex(
@@ -138,7 +149,7 @@ examSchema.virtual("examQuestions", {
   foreignField: "examId",
 });
 
-// ====================== PRE-SAVE VALIDATION FOR MAX QUESTIONS ======================
+// ====================== PRE-SAVE VALIDATION ======================
 examSchema.pre("save", async function (next) {
   if (this.questions && this.questions.length > 50) {
     return next(new Error("An exam cannot have more than 50 questions."));

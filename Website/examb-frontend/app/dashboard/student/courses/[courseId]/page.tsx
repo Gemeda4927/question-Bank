@@ -5,20 +5,28 @@ import { useRouter } from "next/navigation"
 import ProtectedRoute from "@/components/ProtectedRoute"
 import StudentLayout from "@/components/StudentLayout"
 import {
-  CheckCircle,
-  XCircle,
-  Lock,
-  Unlock,
   ArrowLeft,
   BookOpen,
   FileText,
   Clock,
-  DollarSign,
-  Sparkles,
-  CreditCard,
-  Loader2,
   Award,
+  Calendar,
+  MapPin,
+  Play,
+  XCircle,
+  Zap,
+  Target,
+  BarChart3,
+  Star,
   Users,
+  Bookmark,
+  Share2,
+  Eye,
+  Sparkles,
+  Brain,
+  Trophy,
+  Lightbulb,
+  TrendingUp,
 } from "lucide-react"
 
 interface CoursePageProps {
@@ -27,14 +35,14 @@ interface CoursePageProps {
 
 export default function CoursePage({ params }: CoursePageProps) {
   const [course, setCourse] = useState<any>(null)
+  const [exams, setExams] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [paymentLoading, setPaymentLoading] = useState<string | null>(null)
   const [resolvedParams, setResolvedParams] = useState<{ courseId: string } | null>(null)
+  const [isBookmarked, setIsBookmarked] = useState(false)
 
   const router = useRouter()
 
-  // Resolve the async params
   useEffect(() => {
     const resolveParams = async () => {
       const resolved = await params
@@ -46,129 +54,86 @@ export default function CoursePage({ params }: CoursePageProps) {
   useEffect(() => {
     if (resolvedParams) {
       fetchCourse()
+      fetchExams()
     }
   }, [resolvedParams])
 
   const fetchCourse = async () => {
     if (!resolvedParams) return
-
     try {
       setLoading(true)
-      const token = localStorage.getItem("token")
-      if (!token) {
-        setError("Authentication required")
-        return
-      }
-
-      const student = localStorage.getItem("student")
-      if (!student) {
-        setError("Student data not found")
-        return
-      }
-
-      const studentId = JSON.parse(student)._id
-
       const response = await studentService.getAllCourses()
       const allCourses = response.data.data || response.data
-      if (!allCourses || !Array.isArray(allCourses)) {
-        throw new Error("Invalid API response format")
-      }
-
       const foundCourse = allCourses.find((c: any) => c._id === resolvedParams.courseId)
-      if (!foundCourse) {
-        setError("Course not found")
-      } else {
-        console.log("[v0] Course data:", foundCourse)
-        setCourse(foundCourse)
-      }
+      if (!foundCourse) setError("Course not found")
+      else setCourse(foundCourse)
     } catch (err: any) {
-      console.error("Error fetching courses:", err.message, err.response?.data || err)
-      setError(err.response?.data?.message || "Failed to load courses")
+      console.error(err)
+      setError(err.response?.data?.message || "Failed to load course")
     } finally {
       setLoading(false)
     }
   }
 
-  const handleCoursePayment = async () => {
+  const fetchExams = async () => {
     if (!resolvedParams) return
-
     try {
-      setPaymentLoading("course")
-      const response = await studentService.initializeCoursePayment(resolvedParams.courseId)
-      const checkoutUrl = response.data?.checkout_url || response.data?.data?.checkout_url
-
-      if (checkoutUrl) {
-        const urlWithParams = `${checkoutUrl}&type=course&name=${encodeURIComponent(course.name)}`
-        window.location.href = urlWithParams
-      } else {
-        alert("Failed to initialize payment. Please try again.")
-      }
+      const response = await studentService.getAllExams()
+      const allExams = response.data.data || response.data
+      const filteredExams = allExams.filter((exam: any) => exam.courseId?._id === resolvedParams.courseId)
+      setExams(filteredExams)
     } catch (error: any) {
-      console.error("Payment error:", error)
-      alert(error.response?.data?.message || "Failed to initialize payment")
-    } finally {
-      setPaymentLoading(null)
+      console.error("Error fetching exams:", error)
     }
   }
 
-  const handleExamPayment = async (examId: string, examName: string) => {
-    if (!resolvedParams) return
+  const handleTakeExam = (examId: string) => {
+    router.push(`../exams/${examId}/questions`)
 
-    try {
-      setPaymentLoading(examId)
-      const response = await studentService.initializeExamPayment(examId, resolvedParams.courseId)
-      const checkoutUrl = response.data?.checkout_url || response.data?.data?.checkout_url
+    // http://localhost:3000/dashboard/student/exams/68efe2594d9baa474f41ec09/questions
+  }
 
-      if (checkoutUrl) {
-        const urlWithParams = `${checkoutUrl}&type=exam&name=${encodeURIComponent(examName)}`
-        window.location.href = urlWithParams
-      } else {
-        alert("Failed to initialize payment. Please try again.")
-      }
-    } catch (error: any) {
-      console.error("Payment error:", error)
-      alert(error.response?.data?.message || "Failed to initialize payment")
-    } finally {
-      setPaymentLoading(null)
+  const getDifficultyColor = (level: string) => {
+    switch (level?.toLowerCase()) {
+      case 'easy': return 'from-emerald-400 to-teal-500'
+      case 'medium': return 'from-amber-400 to-orange-500'
+      case 'hard': return 'from-rose-400 to-red-500'
+      case 'expert': return 'from-indigo-400 to-purple-500'
+      default: return 'from-slate-400 to-gray-500'
     }
   }
 
-  const handleEnroll = async () => {
-    if (!resolvedParams) return
-
-    try {
-      setPaymentLoading("enroll")
-      await studentService.enrollCourse(resolvedParams.courseId)
-      alert("Successfully enrolled! You can now purchase the course or individual exams.")
-      fetchCourse()
-    } catch (error: any) {
-      console.error("Enrollment error:", error)
-      alert(error.response?.data?.message || "Failed to enroll in course")
-    } finally {
-      setPaymentLoading(null)
+  const getDifficultyText = (level: string) => {
+    switch (level?.toLowerCase()) {
+      case 'easy': return 'Easy'
+      case 'medium': return 'Medium'
+      case 'hard': return 'Hard'
+      case 'expert': return 'Expert'
+      default: return level || 'Not Specified'
     }
   }
 
-  // Get student ID safely
-  const getStudentId = () => {
-    try {
-      const student = localStorage.getItem("student")
-      return student ? JSON.parse(student)._id : null
-    } catch {
-      return null
-    }
+  const formatDuration = (minutes: number) => {
+    if (minutes < 60) return `${minutes} minutes`
+    const hours = Math.floor(minutes / 60)
+    const mins = minutes % 60
+    return mins > 0 ? `${hours}h ${mins}m` : `${hours} hour${hours > 1 ? 's' : ''}`
   }
-
-  const studentId = getStudentId()
 
   if (loading || !resolvedParams) {
     return (
       <ProtectedRoute allowedRole="student">
         <StudentLayout>
-          <div className="flex items-center justify-center h-96">
-            <div className="relative">
-              <div className="w-16 h-16 rounded-full border-4 border-purple-200"></div>
-              <div className="w-16 h-16 rounded-full border-4 border-purple-600 border-t-transparent animate-spin absolute top-0 left-0"></div>
+          <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50/30 flex items-center justify-center">
+            <div className="text-center space-y-6">
+              <div className="relative">
+                <div className="w-20 h-20 animate-spin rounded-full border-4 border-t-purple-600 border-gray-200"></div>
+                <Sparkles className="w-8 h-8 text-purple-500 absolute -top-2 -right-2 animate-pulse" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-xl font-bold text-gray-800">Loading Course</h3>
+                <p className="text-gray-600 max-w-md">Preparing an amazing learning experience for you...</p>
+              </div>
             </div>
           </div>
         </StudentLayout>
@@ -180,280 +145,333 @@ export default function CoursePage({ params }: CoursePageProps) {
     return (
       <ProtectedRoute allowedRole="student">
         <StudentLayout>
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-12 border-2 border-red-100 shadow-lg text-center">
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <XCircle className="w-8 h-8 text-red-600" />
+          <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50/30 flex items-center justify-center p-4">
+            <div className="bg-white/95 backdrop-blur-lg rounded-3xl p-12 border border-red-100 shadow-2xl text-center max-w-lg mx-auto transform hover:scale-[1.02] transition-all duration-300">
+              <div className="w-24 h-24 bg-gradient-to-br from-red-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <XCircle className="w-12 h-12 text-red-500" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-3">{error || "Course not found"}</h3>
+              <p className="text-gray-600 mb-8 text-lg">We couldn't find the course you're looking for.</p>
+              <button
+                onClick={() => router.back()}
+                className="px-8 py-4 bg-gradient-to-r from-purple-500 to-cyan-500 text-white rounded-2xl font-semibold hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-2 mx-auto"
+              >
+                <ArrowLeft className="w-5 h-5" />
+                Back to Courses
+              </button>
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">{error || "Course not found"}</h3>
-            <button
-              onClick={() => router.back()}
-              className="mt-4 flex items-center justify-center gap-2 bg-purple-600 text-white px-6 py-3 rounded-xl shadow hover:bg-purple-700 transition-all mx-auto"
-            >
-              <ArrowLeft className="w-5 h-5" /> Go Back
-            </button>
           </div>
         </StudentLayout>
       </ProtectedRoute>
     )
   }
 
-  const studentSubscription = course.subscribedStudents?.find((s: any) => s.studentId?._id === studentId)
-  const isEnrolled = !!studentSubscription
-  const coursePaymentStatus = studentSubscription?.coursePaymentStatus || "unpaid"
-  const hasFullAccess = coursePaymentStatus === "paid"
-
-  const examsPaidMap = new Map(studentSubscription?.examsPaid?.map((e: any) => [e.examId, e.paymentStatus]) || [])
-
-  const uniqueExams = (course.exams || []).map((exam: any) => ({
-    ...exam,
-    paymentStatus: hasFullAccess ? "paid" : examsPaidMap.get(exam._id) || "unpaid",
-  }))
-
   return (
     <ProtectedRoute allowedRole="student">
       <StudentLayout>
-        <div className="space-y-6">
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-2 text-purple-600 font-semibold hover:text-purple-700 transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5" /> Back to Courses
-          </button>
-
-          <div className="bg-gradient-to-r from-purple-600 to-cyan-600 rounded-3xl p-8 text-white shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-400/20 rounded-full blur-3xl"></div>
-
-            <div className="relative z-10">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
-                  <BookOpen className="w-8 h-8" />
-                </div>
-                <div>
-                  <h1 className="text-4xl font-black mb-1">{course.name}</h1>
-                  <p className="text-purple-100 font-semibold">{course.code}</p>
-                </div>
-              </div>
-
-              {course.description && (
-                <p className="text-purple-100 text-lg mb-6 leading-relaxed">{course.description}</p>
-              )}
-
-              <div className="flex flex-wrap gap-3 mb-6">
-                <span
-                  className={`px-4 py-2 rounded-full font-bold text-sm ${
-                    hasFullAccess
-                      ? "bg-green-500 text-white"
-                      : isEnrolled
-                        ? "bg-yellow-400 text-gray-900"
-                        : "bg-white/20 backdrop-blur-sm"
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50/30">
+          <div className="max-w-7xl mx-auto space-y-8 p-6">
+            {/* Navigation */}
+            <div className="flex items-center justify-between">
+              <button
+                onClick={() => router.back()}
+                className="group flex items-center gap-3 text-gray-600 hover:text-purple-600 font-semibold transition-all duration-300 px-6 py-3 rounded-2xl hover:bg-white hover:shadow-lg border border-transparent hover:border-purple-100"
+              >
+                <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" /> 
+                Back to Courses
+              </button>
+              
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={() => setIsBookmarked(!isBookmarked)}
+                  className={`p-3 rounded-2xl transition-all duration-300 ${
+                    isBookmarked 
+                      ? 'bg-amber-50 text-amber-500 border border-amber-200 shadow-lg' 
+                      : 'bg-white text-gray-400 hover:text-amber-500 hover:bg-amber-50 border border-gray-200 hover:border-amber-200'
                   }`}
                 >
-                  {hasFullAccess ? (
-                    <span className="flex items-center gap-2">
-                      <Unlock className="w-4 h-4" /> Full Access
-                    </span>
-                  ) : isEnrolled ? (
-                    <span className="flex items-center gap-2">
-                      <Lock className="w-4 h-4" /> Enrolled - Payment Required
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-2">
-                      <Lock className="w-4 h-4" /> Not Enrolled
-                    </span>
-                  )}
-                </span>
-                <span className="px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm font-bold text-sm">
-                  Level: {course.level}
-                </span>
-                <span className="px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm font-bold text-sm">
-                  Semester: {course.semester}
-                </span>
-                <span className="px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm font-bold text-sm flex items-center gap-2">
-                  <DollarSign className="w-4 h-4" />
-                  {course.price} ETB
-                </span>
-              </div>
-
-              <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Award className="w-5 h-5" />
-                    <span className="text-sm font-medium">Credits</span>
-                  </div>
-                  <p className="text-2xl font-black">{course.creditHours || 0}</p>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <FileText className="w-5 h-5" />
-                    <span className="text-sm font-medium">Exams</span>
-                  </div>
-                  <p className="text-2xl font-black">{uniqueExams.length}</p>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Users className="w-5 h-5" />
-                    <span className="text-sm font-medium">Students</span>
-                  </div>
-                  <p className="text-2xl font-black">{course.subscribedStudents?.length || 0}</p>
-                </div>
-              </div>
-
-              {!isEnrolled && (
-                <button
-                  onClick={handleEnroll}
-                  disabled={paymentLoading === "enroll"}
-                  className="px-8 py-4 bg-white text-purple-600 font-bold rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 disabled:opacity-50 flex items-center gap-2"
-                >
-                  {paymentLoading === "enroll" ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Enrolling...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-5 h-5" />
-                      Enroll in Course
-                    </>
-                  )}
+                  <Bookmark className={`w-5 h-5 ${isBookmarked ? 'fill-current' : ''}`} />
                 </button>
-              )}
-
-              {isEnrolled && !hasFullAccess && (
-                <button
-                  onClick={handleCoursePayment}
-                  disabled={paymentLoading === "course"}
-                  className="px-8 py-4 bg-white text-purple-600 font-bold rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 disabled:opacity-50 flex items-center gap-2"
-                >
-                  {paymentLoading === "course" ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <CreditCard className="w-5 h-5" />
-                      Pay for Full Course Access - {course.price} ETB
-                    </>
-                  )}
+                <button className="p-3 rounded-2xl bg-white text-gray-400 hover:text-purple-600 hover:bg-purple-50 border border-gray-200 hover:border-purple-200 transition-all duration-300">
+                  <Share2 className="w-5 h-5" />
                 </button>
-              )}
+              </div>
             </div>
-          </div>
 
-          <div className="bg-white/90 backdrop-blur-sm rounded-3xl border-2 border-purple-100/50 shadow-lg overflow-hidden">
-            <div className="p-6 border-b border-purple-100 bg-gradient-to-r from-purple-50 to-cyan-50">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                  <FileText className="w-6 h-6 text-purple-600" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-black text-gray-900">Course Exams</h2>
-                  <p className="text-sm text-gray-600">
-                    {hasFullAccess
-                      ? "You have full access to all exams"
-                      : "Purchase individual exams or buy full course access"}
-                  </p>
+            {/* Course Header */}
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-600 via-indigo-600 to-cyan-600 text-white shadow-2xl">
+              <div className="absolute inset-0 bg-black/10"></div>
+              <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -translate-y-48 translate-x-48"></div>
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-300/20 rounded-full -translate-x-32 translate-y-32"></div>
+              
+              <div className="relative z-10 p-8 lg:p-12">
+                <div className="flex flex-col lg:flex-row items-start gap-8">
+                  <div className="flex-1 space-y-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-20 h-20 bg-white/20 rounded-3xl flex items-center justify-center backdrop-blur-sm border border-white/30 shadow-2xl">
+                        <BookOpen className="w-10 h-10" />
+                      </div>
+                      <div className="flex-1">
+                        <h1 className="text-4xl lg:text-5xl font-bold mb-2 leading-tight bg-gradient-to-r from-white to-cyan-100 bg-clip-text text-transparent">
+                          {course.name}
+                        </h1>
+                        <p className="text-purple-100 font-medium text-lg opacity-90">{course.code}</p>
+                      </div>
+                    </div>
+                    
+                    {course.description && (
+                      <p className="text-purple-100 text-lg leading-relaxed max-w-4xl opacity-95">
+                        {course.description}
+                      </p>
+                    )}
+                    
+                    <div className="flex flex-wrap gap-4">
+                      <span className="px-5 py-3 rounded-2xl bg-white/20 backdrop-blur-sm font-semibold text-sm border border-white/30 shadow-lg flex items-center gap-3">
+                        <Award className="w-5 h-5" /> Level: {course.level || "N/A"}
+                      </span>
+                      <span className="px-5 py-3 rounded-2xl bg-white/20 backdrop-blur-sm font-semibold text-sm border border-white/30 shadow-lg flex items-center gap-3">
+                        <Calendar className="w-5 h-5" /> Semester: {course.semester || "N/A"}
+                      </span>
+                      <span className="px-5 py-3 rounded-2xl bg-white/20 backdrop-blur-sm font-semibold text-sm border border-white/30 shadow-lg flex items-center gap-3">
+                        <Users className="w-5 h-5" /> 1.2K Students
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-xl">
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <Star className="w-6 h-6 text-amber-300" />
+                        <span className="text-lg font-bold">4.8/5.0 Rating</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Eye className="w-6 h-6 text-cyan-300" />
+                        <span className="text-lg font-bold">95% Completion</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Trophy className="w-6 h-6 text-purple-300" />
+                        <span className="text-lg font-bold">Expert Level</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="p-6">
-              {uniqueExams.length > 0 ? (
-                <div className="space-y-4">
-                  {uniqueExams.map((exam: any) => {
-                    const examPaid = exam.paymentStatus === "paid"
-                    const canAccess = hasFullAccess || examPaid
+            {/* Progress Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center">
+                    <TrendingUp className="w-6 h-6 text-emerald-600" />
+                  </div>
+                  <div>
+                    <p className="text-gray-600 text-sm">Your Progress</p>
+                    <p className="text-2xl font-bold text-gray-800">68%</p>
+                  </div>
+                </div>
+                <div className="mt-4 w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-gradient-to-r from-emerald-400 to-teal-500 h-2 rounded-full w-2/3"></div>
+                </div>
+              </div>
+              
+              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center">
+                    <Brain className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="text-gray-600 text-sm">Exams Completed</p>
+                    <p className="text-2xl font-bold text-gray-800">3/5</p>
+                  </div>
+                </div>
+                <div className="mt-4 w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-gradient-to-r from-blue-400 to-cyan-500 h-2 rounded-full w-3/5"></div>
+                </div>
+              </div>
+              
+              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-purple-100 rounded-2xl flex items-center justify-center">
+                    <Lightbulb className="w-6 h-6 text-purple-600" />
+                  </div>
+                  <div>
+                    <p className="text-gray-600 text-sm">Average Score</p>
+                    <p className="text-2xl font-bold text-gray-800">84%</p>
+                  </div>
+                </div>
+                <div className="mt-4 w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-gradient-to-r from-purple-400 to-pink-500 h-2 rounded-full w-4/5"></div>
+                </div>
+              </div>
+            </div>
 
-                    return (
-                      <div
-                        key={exam._id}
-                        className={`p-6 rounded-2xl border-2 transition-all hover:shadow-lg ${
-                          canAccess
-                            ? "bg-gradient-to-r from-green-50 to-emerald-50 border-green-200"
-                            : "bg-gradient-to-r from-gray-50 to-gray-100 border-gray-200"
-                        }`}
-                      >
-                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <div
-                                className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                                  canAccess ? "bg-green-100" : "bg-gray-200"
-                                }`}
-                              >
-                                {canAccess ? (
-                                  <Unlock className="w-5 h-5 text-green-600" />
-                                ) : (
-                                  <Lock className="w-5 h-5 text-gray-500" />
-                                )}
-                              </div>
-                              <h3 className="font-black text-gray-900 text-lg">{exam.name}</h3>
+            {/* Exams Section */}
+            <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
+              <div className="p-8 border-b border-gray-200 bg-gradient-to-r from-purple-50 via-white to-cyan-50">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg">
+                      <Target className="w-7 h-7 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-3xl font-bold text-gray-800">Available Exams</h2>
+                      <p className="text-gray-600 text-lg mt-2">Test your knowledge and track your progress</p>
+                    </div>
+                  </div>
+                  <div className="text-center lg:text-right">
+                    <p className="text-3xl font-bold text-purple-600">{exams.length} Exams</p>
+                    <p className="text-gray-500 text-lg">Ready to take</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-8 space-y-8">
+                {exams.length === 0 ? (
+                  <div className="text-center py-16">
+                    <div className="w-32 h-32 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                      <FileText className="w-12 h-12 text-gray-400" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-700 mb-3">No Exams Available</h3>
+                    <p className="text-gray-500 max-w-md mx-auto text-lg">
+                      There are no exams available for this course yet. Please check back later.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid gap-8">
+                    {exams.map((exam: any, index: number) => {
+                      const difficulty = exam.difficulty || 'medium'
+                      const isNew = index < 2 // Mark first two exams as new
+                      
+                      return (
+                        <div
+                          key={exam._id}
+                          className="group relative bg-gradient-to-br from-white to-gray-50 rounded-3xl border border-gray-200 hover:border-purple-200 shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden"
+                        >
+                          {isNew && (
+                            <div className="absolute top-6 right-6 z-10">
+                              <span className="px-4 py-2 bg-gradient-to-r from-green-400 to-emerald-500 text-white text-sm font-bold rounded-full shadow-lg flex items-center gap-2">
+                                <Sparkles className="w-4 h-4" />
+                                NEW
+                              </span>
                             </div>
-                            {exam.description && <p className="text-gray-600 text-sm mb-2">{exam.description}</p>}
-                            {exam.duration && (
-                              <div className="flex items-center gap-2 text-sm text-gray-500">
-                                <Clock className="w-4 h-4" />
-                                <span>{exam.duration} minutes</span>
-                              </div>
-                            )}
-                          </div>
+                          )}
+                          
+                          <div className="p-8">
+                            <div className="flex flex-col lg:flex-row justify-between items-start gap-8">
+                              {/* Exam Info */}
+                              <div className="flex-1 space-y-6">
+                                <div className="flex items-start gap-6">
+                                  <div className={`w-20 h-20 rounded-2xl flex items-center justify-center shadow-xl bg-gradient-to-r ${getDifficultyColor(difficulty)}`}>
+                                    <Zap className="w-8 h-8 text-white" />
+                                  </div>
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-4 mb-3">
+                                      <h3 className="text-3xl font-bold text-gray-800">{exam.name}</h3>
+                                      <span className={`px-4 py-2 rounded-full text-sm font-bold bg-gradient-to-r ${getDifficultyColor(difficulty)} text-white shadow-lg`}>
+                                        {getDifficultyText(difficulty)}
+                                      </span>
+                                    </div>
+                                    <p className="text-gray-600 text-lg leading-relaxed mb-6">{exam.description}</p>
+                                    
+                                    {/* Exam Metadata Grid */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                                      <div className="flex items-center gap-4 p-4 bg-white rounded-2xl shadow-sm border border-gray-100">
+                                        <div className="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center">
+                                          <Clock className="w-7 h-7 text-blue-600" />
+                                        </div>
+                                        <div>
+                                          <p className="font-medium text-sm text-gray-600">Duration</p>
+                                          <p className="font-semibold text-lg">{formatDuration(exam.duration)}</p>
+                                        </div>
+                                      </div>
+                                      
+                                      <div className="flex items-center gap-4 p-4 bg-white rounded-2xl shadow-sm border border-gray-100">
+                                        <div className="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center">
+                                          <Award className="w-7 h-7 text-green-600" />
+                                        </div>
+                                        <div>
+                                          <p className="font-medium text-sm text-gray-600">Total Marks</p>
+                                          <p className="font-semibold text-lg">{exam.totalMarks} Points</p>
+                                        </div>
+                                      </div>
+                                      
+                                      <div className="flex items-center gap-4 p-4 bg-white rounded-2xl shadow-sm border border-gray-100">
+                                        <div className="w-14 h-14 bg-amber-100 rounded-2xl flex items-center justify-center">
+                                          <BarChart3 className="w-7 h-7 text-amber-600" />
+                                        </div>
+                                        <div>
+                                          <p className="font-medium text-sm text-gray-600">Questions</p>
+                                          <p className="font-semibold text-lg">{exam.questions?.length || 'N/A'}</p>
+                                        </div>
+                                      </div>
 
-                          <div className="flex items-center gap-3">
-                            {canAccess ? (
-                              <>
-                                <span className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-bold">
-                                  <CheckCircle className="w-4 h-4" />
-                                  Unlocked
-                                </span>
+                                      <div className="flex items-center gap-4 p-4 bg-white rounded-2xl shadow-sm border border-gray-100">
+                                        <div className="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center">
+                                          <BookOpen className="w-7 h-7 text-purple-600" />
+                                        </div>
+                                        <div>
+                                          <p className="font-medium text-sm text-gray-600">Type</p>
+                                          <p className="font-semibold text-lg">{exam.type || 'General'}</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    
+                                    {/* Additional Info */}
+                                    <div className="flex flex-wrap gap-3">
+                                      {exam.universityId?.name && (
+                                        <span className="px-5 py-3 rounded-2xl bg-gradient-to-r from-blue-50 to-purple-50 text-blue-700 font-medium text-base flex items-center gap-3 border border-blue-100 shadow-sm">
+                                          <MapPin className="w-5 h-5" /> 
+                                          {exam.universityId.name}
+                                        </span>
+                                      )}
+                                      {exam.code && (
+                                        <span className="px-5 py-3 rounded-2xl bg-gray-100 text-gray-700 font-medium text-base border border-gray-200 shadow-sm">
+                                          Code: {exam.code}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Action Button */}
+                              <div className="flex flex-col gap-4 min-w-[220px]">
+
+
+
                                 <button
-                                  onClick={() => router.push(`/dashboard/student/exams/${exam._id}`)}
-                                  className="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold rounded-xl hover:shadow-lg transition-all hover:scale-105"
+                                  onClick={() => handleTakeExam(exam._id)}
+                                  className="px-8 py-4 bg-gradient-to-r from-purple-500 to-cyan-500 text-white rounded-2xl font-bold hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-3 group relative overflow-hidden"
                                 >
-                                  Take Exam
+                                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                  <div className="relative z-10 flex items-center gap-3">
+                                    <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                                      <Play className="w-4 h-4 text-white" />
+                                    </div>
+                                    <span className="text-lg">Take Exam</span>
+                                  </div>
                                 </button>
-                              </>
-                            ) : (
-                              <>
-                                <span className="inline-flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-full text-sm font-bold">
-                                  <XCircle className="w-4 h-4" />
-                                  Locked
-                                </span>
-                                {isEnrolled && (
-                                  <button
-                                    onClick={() => handleExamPayment(exam._id, exam.name)}
-                                    disabled={paymentLoading === exam._id}
-                                    className="px-6 py-3 bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-bold rounded-xl hover:shadow-lg transition-all hover:scale-105 disabled:opacity-50 flex items-center gap-2"
-                                  >
-                                    {paymentLoading === exam._id ? (
-                                      <>
-                                        <Loader2 className="w-5 h-5 animate-spin" />
-                                        Processing...
-                                      </>
-                                    ) : (
-                                      <>
-                                        <CreditCard className="w-5 h-5" />
-                                        Pay {exam.price || Math.round(course.price / uniqueExams.length)} ETB
-                                      </>
-                                    )}
-                                  </button>
-                                )}
-                              </>
-                            )}
+
+
+
+
+
+
+
+                                <button className="px-6 py-3 text-gray-600 hover:text-purple-600 font-semibold rounded-xl hover:bg-purple-50 border border-gray-200 hover:border-purple-200 transition-all duration-300 flex items-center justify-center gap-2">
+                                  <Eye className="w-5 h-5" />
+                                  Preview Exam
+                                </button>
+                              </div>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <FileText className="w-8 h-8 text-purple-600" />
+                      )
+                    })}
                   </div>
-                  <p className="text-gray-600 font-medium">No exams available for this course yet.</p>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>

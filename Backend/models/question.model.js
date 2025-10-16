@@ -17,7 +17,10 @@ const questionSchema = new mongoose.Schema(
       enum: ['multiple-choice', 'true-false', 'short-answer'],
       default: 'multiple-choice',
     },
-    options: [String],
+    options: {
+      type: [String],
+      default: [],
+    },
     correctAnswer: {
       type: String,
       trim: true,
@@ -28,6 +31,37 @@ const questionSchema = new mongoose.Schema(
       default: 1,
     },
     category: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    difficulty: {
+      type: String,
+      enum: ['easy', 'medium', 'hard'],
+      default: 'easy',
+    },
+    tags: {
+      type: [String],
+      default: [],
+    },
+    timeLimit: {
+      type: Number, // in seconds
+      default: 0,
+    },
+    hints: {
+      type: [String],
+      default: [],
+    },
+    explanation: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    shuffleOptions: {
+      type: Boolean,
+      default: false,
+    },
+    reference: {
       type: String,
       trim: true,
       default: '',
